@@ -254,9 +254,6 @@ Define in short about the project
 
 #### and put for docker-compose.yml
 
----
-
-    ```
     services:
       postgres:
     	image: postgres:16
@@ -274,168 +271,179 @@ Define in short about the project
     volumes:
       postgres_data:
 
-```
----
-
 #### Start PostgreSQL
-	docker compose up -d
+
+    docker compose up -d
 
 #### Check
-	docker ps
+
+    docker ps
 
 ## 7. Git Setup
+
 - Initialize Git
-	git init
+  git init
 - Create .gitignore and add minimium of
+
 ---
-	```
-	node_modules/
-	.env
-	.env.local
-	dist/
-	.next/
-	coverage/
-	*.log
-	```
+
+    ```
+    node_modules/
+    .env
+    .env.local
+    dist/
+    .next/
+    coverage/
+    *.log
+    ```
     ---
+
 - after the basic project structure works , create the first commit
-	git add .
-	git commit -m "chore: initialize project"
+  git add .
+  git commit -m "chore: initialize project"
 
 ## 8. Backend Initialization
+
 ### 8.1 build NestJS
-	backend/
 
-	npm install -g @nestjs/cli
-	nest new backend
+    backend/
 
-	√ Which package manager would you ❤️  to use? ### npm
-	√ Would you like to enable auto-instrumented observability (@nestjs/observe)? ### N
-	√ Which module system would you like to use? ### ESM (ES Modules)         [ with vitest ]
+    npm install -g @nestjs/cli
+    nest new backend
+
+    √ Which package manager would you ❤️  to use? ### npm
+    √ Would you like to enable auto-instrumented observability (@nestjs/observe)? ### N
+    √ Which module system would you like to use? ### ESM (ES Modules)         [ with vitest ]
 
 ### 8.2 install libraries inside of backend folder
-	#### dotenv
-		npm install dotenv
 
-	#### Prisma
-		npm install prisma@7.5.0 @prisma/client@7.5.0
+    #### dotenv
+    	npm install dotenv
 
-	#### PostgreSQL driver
-		npm install pg
-		npm install -D @types/pg
+    #### Prisma
+    	npm install prisma@7.5.0 @prisma/client@7.5.0
 
-	#### Zod
-		npm install zod
+    #### PostgreSQL driver
+    	npm install pg
+    	npm install -D @types/pg
 
-	#### JWT
-		npm install @nestjs/jwt
+    #### Zod
+    	npm install zod
 
-	#### Passport
-		npm install @nestjs/passport passport
+    #### JWT
+    	npm install @nestjs/jwt
 
-	##### To implement JWT authentication with Passport:
-		npm install passport-jwt
-		npm install -D @types/passport-jwt
+    #### Passport
+    	npm install @nestjs/passport passport
 
-	#### Swagger
-		npm install @nestjs/swagger
+    ##### To implement JWT authentication with Passport:
+    	npm install passport-jwt
+    	npm install -D @types/passport-jwt
 
-	#### Helmet
-		npm install helmet
+    #### Swagger
+    	npm install @nestjs/swagger
 
-	#### Throttler
-		npm install @nestjs/throttler
-	#### bcrypt
-		npm install bcrypt
-		npm install -D @types/bcrypt
+    #### Helmet
+    	npm install helmet
 
-		npm install -D tsx
+    #### Throttler
+    	npm install @nestjs/throttler
+    #### bcrypt
+    	npm install bcrypt
+    	npm install -D @types/bcrypt
 
-	#### To Install everything at once
-		npm install dotenv prisma @prisma/client zod @nestjs/jwt @nestjs/passport passport passport-jwt helmet @nestjs/throttler
+    	npm install -D tsx
 
-	#### Initialize Prisma
-		npx prisma init
+    #### To Install everything at once
+    	npm install dotenv prisma @prisma/client zod @nestjs/jwt @nestjs/passport passport passport-jwt helmet @nestjs/throttler
 
-	#### To verify prisma
-		npx prisma validate
+    #### Initialize Prisma
+    	npx prisma init
+
+    #### To verify prisma
+    	npx prisma validate
 
 ## 9. Prisma Setup
+
 ### The structure should be
-	backend/
-	│
-	├── prisma/
-	│   └── schema.prisma
-	│
-	├── prisma.config.ts
-	│
-	├── .env
-	└── package.json
+
+    backend/
+    │
+    ├── prisma/
+    │   └── schema.prisma
+    │
+    ├── prisma.config.ts
+    │
+    ├── .env
+    └── package.json
 
 ### create .env on backend and put below
-	```bash
-	PORT=4000
-	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n3_db?schema=public"
-	```
-	- Now Prisma can connect to PostgreSQL.
 
+    ```bash
+    PORT=4000
+    DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n3_db?schema=public"
+    ```
+    - Now Prisma can connect to PostgreSQL.
 
 ### on prisma.config.ts
-	```bash
-	import "dotenv/config";
-	import { defineConfig } from "prisma/config";
 
-	export default defineConfig({
-	  schema: "prisma/schema.prisma",
-	  migrations: {
-	    path: "prisma/migrations",
-	  },
-	  datasource: {
-	    url: process.env.DATABASE_URL!,
-	  },
-	});
-	```
+    ```bash
+    import "dotenv/config";
+    import { defineConfig } from "prisma/config";
 
+    export default defineConfig({
+      schema: "prisma/schema.prisma",
+      migrations: {
+        path: "prisma/migrations",
+      },
+      datasource: {
+        url: process.env.DATABASE_URL!,
+      },
+    });
+    ```
 
 ### Design the Database Before Business Modules
+
 - lets start by designing the data model. we can start with-
-	RBAC
-	Geography
-	Master Data
+  RBAC
+  Geography
+  Master Data
 
 - conceptual dependency
-	RBAC
-	 │
-	 └── Users
-		  │
-		  └── Roles
-			   │
-			   └── Permissions
+  RBAC
+  │
+  └── Users
+  │
+  └── Roles
+  │
+  └── Permissions
 
-
-	Geography
-	 │
-	 └── Region
-		  └── Zone
-			   └── Woreda
-					└── Kebele
-
+  Geography
+  │
+  └── Region
+  └── Zone
+  └── Woreda
+  └── Kebele
 
 ### Database Modeling Rules
+
 - Before creating models, define rules. Every major entity should have:
-	```bash
-	id
-	createdAt
-	updatedAt
-	deletedAt
-	createdBy
-	updatedBy
+
+  ```bash
+  id
+  createdAt
+  updatedAt
+  deletedAt
+  createdBy
+  updatedBy
 
   ------------
-	id String @id @default(uuid()) @db.Uuid
-	createdAt DateTime @default(now()) @map("created_at")
-	@@map("users")
+  id String @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("users")
   ------------
+  ```
+
 ````
 
 - decide
@@ -3315,3 +3323,4 @@ const mutation = useMutation({
 ---
 
 _Last updated: September 2026_
+````
