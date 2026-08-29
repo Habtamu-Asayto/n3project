@@ -274,7 +274,7 @@ Define in short about the project
     volumes:
       postgres_data:
 
-````
+```
 ---
 
 #### Start PostgreSQL
