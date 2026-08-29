@@ -109,7 +109,6 @@ Define in short about the project
           ▼
       PostgreSQL
 
-
 ### PART 0: Understand the System Before Coding
 
 - Understand the business of the system
@@ -188,7 +187,6 @@ Define in short about the project
                           ▼
                     PostgreSQL
 
-
 ## 5. Decide the Project Structure
 
     n3project/
@@ -206,7 +204,6 @@ Define in short about the project
     │   └── package.json
     └── frontend/
     	└── package.json
-
 
 ### 5.2. Project structure 2 - monorepo/workspace.
 
@@ -255,9 +252,11 @@ Define in short about the project
   backend/
   docker-compose.yml
 
-#### and put for docker-compose.yml:
+#### and put for docker-compose.yml
 
-    ```bash
+---
+
+    ```
     services:
       postgres:
     	image: postgres:16
@@ -276,6 +275,8 @@ Define in short about the project
       postgres_data:
 
 ````
+---
+
 #### Start PostgreSQL
 	docker compose up -d
 
@@ -286,7 +287,8 @@ Define in short about the project
 - Initialize Git
 	git init
 - Create .gitignore and add minimium of
-	```bash
+---
+	```
 	node_modules/
 	.env
 	.env.local
@@ -295,6 +297,7 @@ Define in short about the project
 	coverage/
 	*.log
 	```
+    ---
 - after the basic project structure works , create the first commit
 	git add .
 	git commit -m "chore: initialize project"
@@ -433,348 +436,356 @@ Define in short about the project
 	createdAt DateTime @default(now()) @map("created_at")
 	@@map("users")
   ------------
-  ```
+````
+
 - decide
-	```bash
-	UUID strategy
-	foreign keys
-	cascade behavior
-	soft delete
-	indexes
-	unique constraints
-	nullable fields
-	audit fields
-	timestamps
-	enum strategy
-	```
+  ```bash
+  UUID strategy
+  foreign keys
+  cascade behavior
+  soft delete
+  indexes
+  unique constraints
+  nullable fields
+  audit fields
+  timestamps
+  enum strategy
+  ```
+
 ### Create Database ERD
+
 - Before writing Prisma models, create an ERD. which helps as to design Prisma schema much easier.like below-
-	Region
-	  │
-	  └──< Zone
-			 │
-			 └──< Woreda
-					│
-					└──< Kebele
-						   │
-						   └──< Farmer
+  Region
+  │
+  └──< Zone
+  │
+  └──< Woreda
+  │
+  └──< Kebele
+  │
+  └──< Farmer
 
 ### Create your first database model
-	- Open backend/prisma/schema.prisma
+
+    - Open backend/prisma/schema.prisma
+
 #### Then add:
-	```bash
-	// ============================================================================
-	// Project_Name- Prisma Schema
-	// Phase 1: RBAC + Geography Hierarchy + Master Data
-	// ============================================================================
 
-	generator client {
-	  provider = "prisma-client-js"
-	}
+    ```bash
+    // ============================================================================
+    // Project_Name- Prisma Schema
+    // Phase 1: RBAC + Geography Hierarchy + Master Data
+    // ============================================================================
 
-	datasource db {
-	  provider = "postgresql"
-	}
+    generator client {
+      provider = "prisma-client-js"
+    }
 
-	// ============================================================================
-	// RBAC Models
-	// ============================================================================
+    datasource db {
+      provider = "postgresql"
+    }
 
-	model User {
-	  id           String   @id @default(uuid()) @db.Uuid
-	  email        String   @unique @db.VarChar(255)
-	  username     String   @unique @db.VarChar(100)
-	  mobileNumber String?  @unique @map("mobile_number") @db.VarChar(20)
-	  password     String   @db.VarChar(255)
-	  firstName    String   @map("first_name") @db.VarChar(100)
-	  lastName     String   @map("last_name") @db.VarChar(100)
-	  phone        String?  @db.VarChar(20)
-	  avatar       String?  @db.VarChar(500)
-	  isActive     Boolean  @default(true) @map("is_active")
-	  isLocked     Boolean  @default(false) @map("is_locked")
-	  lastLoginAt       DateTime? @map("last_login_at")
-	  failedLoginAttempts Int @default(0) @map("failed_login_attempts")
-	  passwordChangedAt DateTime? @map("password_changed_at")
+    // ============================================================================
+    // RBAC Models
+    // ============================================================================
 
-	  // Geography assignment (only one should be set for non-admin users)
-	  regionId String? @map("region_id") @db.Uuid
-	  zoneId   String? @map("zone_id") @db.Uuid
-	  woredaId String? @map("woreda_id") @db.Uuid
-	  kebeleId String? @map("kebele_id") @db.Uuid
+    model User {
+      id           String   @id @default(uuid()) @db.Uuid
+      email        String   @unique @db.VarChar(255)
+      username     String   @unique @db.VarChar(100)
+      mobileNumber String?  @unique @map("mobile_number") @db.VarChar(20)
+      password     String   @db.VarChar(255)
+      firstName    String   @map("first_name") @db.VarChar(100)
+      lastName     String   @map("last_name") @db.VarChar(100)
+      phone        String?  @db.VarChar(20)
+      avatar       String?  @db.VarChar(500)
+      isActive     Boolean  @default(true) @map("is_active")
+      isLocked     Boolean  @default(false) @map("is_locked")
+      lastLoginAt       DateTime? @map("last_login_at")
+      failedLoginAttempts Int @default(0) @map("failed_login_attempts")
+      passwordChangedAt DateTime? @map("password_changed_at")
 
-	  // Audit fields
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      // Geography assignment (only one should be set for non-admin users)
+      regionId String? @map("region_id") @db.Uuid
+      zoneId   String? @map("zone_id") @db.Uuid
+      woredaId String? @map("woreda_id") @db.Uuid
+      kebeleId String? @map("kebele_id") @db.Uuid
 
-	  // Relations
-	  userRoles     UserRole[]
-	  refreshTokens RefreshToken[]
-	  auditLogs     AuditLog[]
-	  region        Region? @relation(fields: [regionId], references: [id])
-	  zone          Zone?   @relation(fields: [zoneId], references: [id])
-	  woreda        Woreda? @relation(fields: [woredaId], references: [id])
-	  kebele        Kebele? @relation(fields: [kebeleId], references: [id])
-	  warehousesCreated Warehouse[] @relation("WarehouseCreatedBy")
-	  warehousesUpdated Warehouse[] @relation("WarehouseUpdatedBy")
+      // Audit fields
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  @@map("users")
-	  @@index([email])
-	  @@index([username])
-	  @@index([mobileNumber])
-	  @@index([deletedAt])
-	  @@index([regionId])
-	  @@index([zoneId])
-	  @@index([woredaId])
-	  @@index([kebeleId])
-	}
+      // Relations
+      userRoles     UserRole[]
+      refreshTokens RefreshToken[]
+      auditLogs     AuditLog[]
+      region        Region? @relation(fields: [regionId], references: [id])
+      zone          Zone?   @relation(fields: [zoneId], references: [id])
+      woreda        Woreda? @relation(fields: [woredaId], references: [id])
+      kebele        Kebele? @relation(fields: [kebeleId], references: [id])
+      warehousesCreated Warehouse[] @relation("WarehouseCreatedBy")
+      warehousesUpdated Warehouse[] @relation("WarehouseUpdatedBy")
+
+      @@map("users")
+      @@index([email])
+      @@index([username])
+      @@index([mobileNumber])
+      @@index([deletedAt])
+      @@index([regionId])
+      @@index([zoneId])
+      @@index([woredaId])
+      @@index([kebeleId])
+    }
 
 
-	model Role {
-	  id          String  @id @default(uuid()) @db.Uuid
-	  name        String  @unique @db.VarChar(100)
-	  displayName String  @map("display_name") @db.VarChar(150)
-	  description String? @db.VarChar(500)
-	  isSystem    Boolean @default(false) @map("is_system")
-	  isActive    Boolean @default(true) @map("is_active")
+    model Role {
+      id          String  @id @default(uuid()) @db.Uuid
+      name        String  @unique @db.VarChar(100)
+      displayName String  @map("display_name") @db.VarChar(150)
+      description String? @db.VarChar(500)
+      isSystem    Boolean @default(false) @map("is_system")
+      isActive    Boolean @default(true) @map("is_active")
 
-	  // Audit fields
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      // Audit fields
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  // Relations
-	  userRoles       UserRole[]
-	  rolePermissions RolePermission[]
+      // Relations
+      userRoles       UserRole[]
+      rolePermissions RolePermission[]
 
-	  @@map("roles")
-	  @@index([name])
-	  @@index([deletedAt])
-	}
+      @@map("roles")
+      @@index([name])
+      @@index([deletedAt])
+    }
 
-	model Permission {
-	  id          String  @id @default(uuid()) @db.Uuid
-	  name        String  @unique @db.VarChar(150)
-	  displayName String  @map("display_name") @db.VarChar(200)
-	  description String? @db.VarChar(500)
-	  module      String  @db.VarChar(100)
-	  action      String  @db.VarChar(50)
-	  isActive    Boolean @default(true) @map("is_active")
+    model Permission {
+      id          String  @id @default(uuid()) @db.Uuid
+      name        String  @unique @db.VarChar(150)
+      displayName String  @map("display_name") @db.VarChar(200)
+      description String? @db.VarChar(500)
+      module      String  @db.VarChar(100)
+      action      String  @db.VarChar(50)
+      isActive    Boolean @default(true) @map("is_active")
 
-	  // Audit fields
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      // Audit fields
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  // Relations
-	  rolePermissions RolePermission[]
+      // Relations
+      rolePermissions RolePermission[]
 
-	  @@unique([module, action])
-	  @@map("permissions")
-	  @@index([module])
-	  @@index([deletedAt])
-	}
+      @@unique([module, action])
+      @@map("permissions")
+      @@index([module])
+      @@index([deletedAt])
+    }
 
-	model UserRole {
-	  id     String @id @default(uuid()) @db.Uuid
-	  userId String @map("user_id") @db.Uuid
-	  roleId String @map("role_id") @db.Uuid
+    model UserRole {
+      id     String @id @default(uuid()) @db.Uuid
+      userId String @map("user_id") @db.Uuid
+      roleId String @map("role_id") @db.Uuid
 
-	  // Audit fields
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      // Audit fields
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  // Relations
-	  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-	  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+      // Relations
+      user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+      role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-	  @@unique([userId, roleId])
-	  @@map("user_roles")
-	  @@index([userId])
-	  @@index([roleId])
-	  @@index([deletedAt])
-	}
+      @@unique([userId, roleId])
+      @@map("user_roles")
+      @@index([userId])
+      @@index([roleId])
+      @@index([deletedAt])
+    }
 
-	model RolePermission {
-	  id           String @id @default(uuid()) @db.Uuid
-	  roleId       String @map("role_id") @db.Uuid
-	  permissionId String @map("permission_id") @db.Uuid
+    model RolePermission {
+      id           String @id @default(uuid()) @db.Uuid
+      roleId       String @map("role_id") @db.Uuid
+      permissionId String @map("permission_id") @db.Uuid
 
-	  // Audit fields
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      // Audit fields
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  // Relations
-	  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-	  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+      // Relations
+      role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+      permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
-	  @@unique([roleId, permissionId])
-	  @@map("role_permissions")
-	  @@index([roleId])
-	  @@index([permissionId])
-	  @@index([deletedAt])
-	}
+      @@unique([roleId, permissionId])
+      @@map("role_permissions")
+      @@index([roleId])
+      @@index([permissionId])
+      @@index([deletedAt])
+    }
 
-	model RefreshToken {
-	  id        String    @id @default(uuid()) @db.Uuid
-	  token     String    @unique @db.VarChar(500)
-	  userId    String    @map("user_id") @db.Uuid
-	  expiresAt DateTime  @map("expires_at")
-	  revokedAt DateTime? @map("revoked_at")
-	  ipAddress String?   @map("ip_address") @db.VarChar(45)
-	  userAgent String?   @map("user_agent") @db.VarChar(500)
+    model RefreshToken {
+      id        String    @id @default(uuid()) @db.Uuid
+      token     String    @unique @db.VarChar(500)
+      userId    String    @map("user_id") @db.Uuid
+      expiresAt DateTime  @map("expires_at")
+      revokedAt DateTime? @map("revoked_at")
+      ipAddress String?   @map("ip_address") @db.VarChar(45)
+      userAgent String?   @map("user_agent") @db.VarChar(500)
 
-	  // Audit fields
-	  createdAt DateTime @default(now()) @map("created_at")
-	  updatedAt DateTime @updatedAt @map("updated_at")
+      // Audit fields
+      createdAt DateTime @default(now()) @map("created_at")
+      updatedAt DateTime @updatedAt @map("updated_at")
 
-	  // Relations
-	  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+      // Relations
+      user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-	  @@map("refresh_tokens")
-	  @@index([userId])
-	  @@index([token])
-	  @@index([expiresAt])
-	}
+      @@map("refresh_tokens")
+      @@index([userId])
+      @@index([token])
+      @@index([expiresAt])
+    }
 
-	model AuditLog {
-	  id        String   @id @default(uuid()) @db.Uuid
-	  userId    String?  @map("user_id") @db.Uuid
-	  action    String   @db.VarChar(50)
-	  entity    String   @db.VarChar(100)
-	  entityId  String?  @map("entity_id") @db.VarChar(100)
-	  oldValues Json?    @map("old_values")
-	  newValues Json?    @map("new_values")
-	  ipAddress String?  @map("ip_address") @db.VarChar(45)
-	  userAgent String?  @map("user_agent") @db.VarChar(500)
-	  createdAt DateTime @default(now()) @map("created_at")
+    model AuditLog {
+      id        String   @id @default(uuid()) @db.Uuid
+      userId    String?  @map("user_id") @db.Uuid
+      action    String   @db.VarChar(50)
+      entity    String   @db.VarChar(100)
+      entityId  String?  @map("entity_id") @db.VarChar(100)
+      oldValues Json?    @map("old_values")
+      newValues Json?    @map("new_values")
+      ipAddress String?  @map("ip_address") @db.VarChar(45)
+      userAgent String?  @map("user_agent") @db.VarChar(500)
+      createdAt DateTime @default(now()) @map("created_at")
 
-	  // Relations
-	  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+      // Relations
+      user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-	  @@map("audit_logs")
-	  @@index([userId])
-	  @@index([entity])
-	  @@index([action])
-	  @@index([createdAt])
-	}
+      @@map("audit_logs")
+      @@index([userId])
+      @@index([entity])
+      @@index([action])
+      @@index([createdAt])
+    }
 
-	// ============================================================================
-	// Geography Hierarchy Models
-	// ============================================================================
+    // ============================================================================
+    // Geography Hierarchy Models
+    // ============================================================================
 
-	model Region {
-	  id       String  @id @default(uuid()) @db.Uuid
-	  name     String  @unique @db.VarChar(200)
-	  code     String  @unique @db.VarChar(20)
-	  isActive Boolean @default(true) @map("is_active")
+    model Region {
+      id       String  @id @default(uuid()) @db.Uuid
+      name     String  @unique @db.VarChar(200)
+      code     String  @unique @db.VarChar(20)
+      isActive Boolean @default(true) @map("is_active")
 
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  zones      Zone[]
-	  users      User[]
-	  warehouses Warehouse[]
+      zones      Zone[]
+      users      User[]
+      warehouses Warehouse[]
 
-	  @@map("regions")
-	  @@index([deletedAt])
-	}
+      @@map("regions")
+      @@index([deletedAt])
+    }
 
-	model Zone {
-	  id       String  @id @default(uuid()) @db.Uuid
-	  name     String  @db.VarChar(200)
-	  code     String  @unique @db.VarChar(20)
-	  regionId String  @map("region_id") @db.Uuid
-	  isActive Boolean @default(true) @map("is_active")
+    model Zone {
+      id       String  @id @default(uuid()) @db.Uuid
+      name     String  @db.VarChar(200)
+      code     String  @unique @db.VarChar(20)
+      regionId String  @map("region_id") @db.Uuid
+      isActive Boolean @default(true) @map("is_active")
 
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  region     Region     @relation(fields: [regionId], references: [id])
-	  woredas    Woreda[]
-	  users      User[]
-	  warehouses Warehouse[]
+      region     Region     @relation(fields: [regionId], references: [id])
+      woredas    Woreda[]
+      users      User[]
+      warehouses Warehouse[]
 
-	  @@unique([name, regionId])
-	  @@map("zones")
-	  @@index([regionId])
-	  @@index([deletedAt])
-	}
+      @@unique([name, regionId])
+      @@map("zones")
+      @@index([regionId])
+      @@index([deletedAt])
+    }
 
-	model Woreda {
-	  id       String  @id @default(uuid()) @db.Uuid
-	  name     String  @db.VarChar(200)
-	  code     String  @unique @db.VarChar(20)
-	  zoneId   String  @map("zone_id") @db.Uuid
-	  isActive Boolean @default(true) @map("is_active")
+    model Woreda {
+      id       String  @id @default(uuid()) @db.Uuid
+      name     String  @db.VarChar(200)
+      code     String  @unique @db.VarChar(20)
+      zoneId   String  @map("zone_id") @db.Uuid
+      isActive Boolean @default(true) @map("is_active")
 
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  zone         Zone                @relation(fields: [zoneId], references: [id])
-	  kebeles      Kebele[]
-	  unions       FmsUnion[]
-	  destinations Destination[]
-	  stopAdjustments StopAdjustment[]
-	  users           User[]
-	  warehouses      Warehouse[]
+      zone         Zone                @relation(fields: [zoneId], references: [id])
+      kebeles      Kebele[]
+      unions       FmsUnion[]
+      destinations Destination[]
+      stopAdjustments StopAdjustment[]
+      users           User[]
+      warehouses      Warehouse[]
 
-	  @@unique([name, zoneId])
-	  @@map("woredas")
-	  @@index([zoneId])
-	  @@index([deletedAt])
-	}
+      @@unique([name, zoneId])
+      @@map("woredas")
+      @@index([zoneId])
+      @@index([deletedAt])
+    }
 
-	model Kebele {
-	  id       String  @id @default(uuid()) @db.Uuid
-	  name     String  @db.VarChar(200)
-	  code     String  @unique @db.VarChar(20)
-	  woredaId String  @map("woreda_id") @db.Uuid
-	  isActive Boolean @default(true) @map("is_active")
+    model Kebele {
+      id       String  @id @default(uuid()) @db.Uuid
+      name     String  @db.VarChar(200)
+      code     String  @unique @db.VarChar(20)
+      woredaId String  @map("woreda_id") @db.Uuid
+      isActive Boolean @default(true) @map("is_active")
 
-	  createdAt DateTime  @default(now()) @map("created_at")
-	  updatedAt DateTime  @updatedAt @map("updated_at")
-	  deletedAt DateTime? @map("deleted_at")
-	  createdBy String?   @map("created_by") @db.Uuid
-	  updatedBy String?   @map("updated_by") @db.Uuid
+      createdAt DateTime  @default(now()) @map("created_at")
+      updatedAt DateTime  @updatedAt @map("updated_at")
+      deletedAt DateTime? @map("deleted_at")
+      createdBy String?   @map("created_by") @db.Uuid
+      updatedBy String?   @map("updated_by") @db.Uuid
 
-	  woreda       Woreda              @relation(fields: [woredaId], references: [id])
-	  cooperatives PrimaryCooperative[]
-	  farmers      Farmer[]
-	  stopAdjustments StopAdjustment[]
-	  users           User[]
-	  warehouses      Warehouse[]
+      woreda       Woreda              @relation(fields: [woredaId], references: [id])
+      cooperatives PrimaryCooperative[]
+      farmers      Farmer[]
+      stopAdjustments StopAdjustment[]
+      users           User[]
+      warehouses      Warehouse[]
 
-	  @@unique([name, woredaId])
-	  @@map("kebeles")
-	  @@index([woredaId])
-	  @@index([deletedAt])
-	}
-	```
+      @@unique([name, woredaId])
+      @@map("kebeles")
+      @@index([woredaId])
+      @@index([deletedAt])
+    }
+    ```
 
 #### Add on seed.ts
+
 ####================
+
 ```bash
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
@@ -1030,7 +1041,7 @@ main()
   await prisma.$disconnect();
   await pool.end();
 });
-````
+```
 
 #### Validate prisma
 
@@ -2224,7 +2235,6 @@ npx create-next-app@latest frontend
     	├── infrastructure/
     	├── presentation/
     	└── shared/
-
 
 - App will be, and (authenticated) is just a group
   app/
