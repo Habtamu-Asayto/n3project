@@ -287,7 +287,6 @@ Define in short about the project
 
 ---
 
-    ```
     node_modules/
     .env
     .env.local
@@ -295,8 +294,6 @@ Define in short about the project
     .next/
     coverage/
     *.log
-    ```
-    ---
 
 - after the basic project structure works , create the first commit
   git add .
@@ -317,51 +314,66 @@ Define in short about the project
 
 ### 8.2 install libraries inside of backend folder
 
-    #### dotenv
-    	npm install dotenv
+#### dotenv
 
-    #### Prisma
-    	npm install prisma@7.5.0 @prisma/client@7.5.0
+    npm install dotenv
 
-    #### PostgreSQL driver
-    	npm install pg
-    	npm install -D @types/pg
+#### Prisma
 
-    #### Zod
-    	npm install zod
+    npm install prisma@7.5.0 @prisma/client@7.5.0
 
-    #### JWT
-    	npm install @nestjs/jwt
+#### PostgreSQL driver
 
-    #### Passport
-    	npm install @nestjs/passport passport
+    npm install pg
+    npm install -D @types/pg
 
-    ##### To implement JWT authentication with Passport:
-    	npm install passport-jwt
-    	npm install -D @types/passport-jwt
+#### Zod
 
-    #### Swagger
-    	npm install @nestjs/swagger
+    npm install zod
 
-    #### Helmet
-    	npm install helmet
+#### JWT
 
-    #### Throttler
-    	npm install @nestjs/throttler
-    #### bcrypt
-    	npm install bcrypt
-    	npm install -D @types/bcrypt
+    npm install @nestjs/jwt
 
-    	npm install -D tsx
+#### Passport
 
-    #### To Install everything at once
-    	npm install dotenv prisma @prisma/client zod @nestjs/jwt @nestjs/passport passport passport-jwt helmet @nestjs/throttler
+    npm install @nestjs/passport passport
 
-    #### Initialize Prisma
-    	npx prisma init
+##### To implement JWT authentication with Passport:
 
-    #### To verify prisma
-    	npx prisma validate
+    npm install passport-jwt
+    npm install -D @types/passport-jwt
+
+#### Swagger
+
+    npm install @nestjs/swagger
+
+#### Helmet
+
+    npm install helmet
+
+#### Throttler
+
+    npm install @nestjs/throttler
+
+#### bcrypt
+
+    npm install bcrypt
+    npm install -D @types/bcrypt
+
+    npm install -D tsx
+
+#### To Install everything at once
+
+    npm install dotenv prisma @prisma/client zod @nestjs/jwt @nestjs/passport passport passport-jwt helmet @nestjs/throttler
+
+#### Initialize Prisma
+
+    npx prisma init
+
+#### To verify prisma
+
+    npx prisma validate
 
 ## 9. Prisma Setup
 
@@ -379,15 +391,13 @@ Define in short about the project
 
 ### create .env on backend and put below
 
-    ```bash
     PORT=4000
     DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n3_db?schema=public"
-    ```
-    - Now Prisma can connect to PostgreSQL.
+
+- Now Prisma can connect to PostgreSQL.
 
 ### on prisma.config.ts
 
-    ```bash
     import "dotenv/config";
     import { defineConfig } from "prisma/config";
 
@@ -400,7 +410,6 @@ Define in short about the project
         url: process.env.DATABASE_URL!,
       },
     });
-    ```
 
 ### Design the Database Before Business Modules
 
@@ -429,7 +438,6 @@ Define in short about the project
 
 - Before creating models, define rules. Every major entity should have:
 
-  ```bash
   id
   createdAt
   updatedAt
@@ -437,17 +445,15 @@ Define in short about the project
   createdBy
   updatedBy
 
-  ------------
+  ***
+
   id String @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
   @@map("users")
-  ------------
-  ```
 
-````
+  ***
 
 - decide
-  ```bash
   UUID strategy
   foreign keys
   cascade behavior
@@ -458,7 +464,6 @@ Define in short about the project
   audit fields
   timestamps
   enum strategy
-  ```
 
 ### Create Database ERD
 
@@ -475,7 +480,7 @@ Define in short about the project
 
 ### Create your first database model
 
-    - Open backend/prisma/schema.prisma
+- Open backend/prisma/schema.prisma
 
 #### Then add:
 
@@ -1055,25 +1060,36 @@ main()
 
     	npx prisma validate
 
-    #### Then, Run->
-    	npx prisma migrate dev --name init,
-    - later i may use : npx prisma migrate dev --name add_model_name
+#### Then, Run->
 
-    #### Then->
-    	npx prisma generate
-    #### Insert initial/default data
-    	/// npx ts-node prisma/seeds/seed.ts
-    	npx prisma db seed
+    npx prisma migrate dev --name init,
 
-    #### To check seeded data on prisma studio
-    	npx prisma studio
-    #### We can also check the postgresql on docker using window powershell
-    	docker exec -it n3-postgres psql -U postgres -d n3_db
-    ##### List Database
-    	\l
+- later i may use : npx prisma migrate dev --name add_model_name
 
-    #####List Tables
-    	\dt		\d users
+#### Then->
+
+    npx prisma generate
+
+#### Insert initial/default data
+
+    /// npx ts-node prisma/seeds/seed.ts
+    npx prisma db seed
+
+#### To check seeded data on prisma studio
+
+    npx prisma studio
+
+#### We can also check the postgresql on docker using window powershell
+
+    docker exec -it n3-postgres psql -U postgres -d n3_db
+
+##### List Database
+
+    \l
+
+##### List Tables
+
+    \dt		\d users
 
 #### Now we have:
 
@@ -1082,8 +1098,6 @@ main()
     	Prisma
     	  |
     	PostgreSQL
-
----
 
 ### Default Credentials
 
@@ -1101,9 +1115,7 @@ main()
 | `http://localhost:3016`            | Frontend                  |
 | `http://localhost:3016/api/v1/...` | BFF proxy to backend      |
 
----
-
-##10. Backend Architecture(NestJS)
+## 10. Backend Architecture(NestJS)
 
 - Modular Monolith
 - Clean Architecture
@@ -1162,147 +1174,137 @@ main()
 
 ### 10.1.1 Detail Directory Structure
 
-```
 backend/src/
-├── main.ts                          # Bootstrap, global pipes/filters/interceptors
-├── app.module.ts                    # Root module — imports all feature modules
+├── main.ts # Bootstrap, global pipes/filters/interceptors
+├── app.module.ts # Root module — imports all feature modules
 │
-├── domain/                          # LAYER 1: Domain (innermost)
-│   └── <module>/
-│       ├── entities/                # Entity interfaces (pure TypeScript)
-│       │   └── <entity>.entity.ts
-│       ├── repositories/            # Repository interfaces (contracts)
-│       │   └── <entity>.repository.ts
-│       └── services/                # Domain services (pure business logic, optional)
-│           └── <module>.service.ts
+├── domain/ # LAYER 1: Domain (innermost)
+│ └── <module>/
+│ ├── entities/ # Entity interfaces (pure TypeScript)
+│ │ └── <entity>.entity.ts
+│ ├── repositories/ # Repository interfaces (contracts)
+│ │ └── <entity>.repository.ts
+│ └── services/ # Domain services (pure business logic, optional)
+│ └── <module>.service.ts
 │
-├── application/                     # LAYER 2: Application
-│   └── <module>/
-│       ├── dto/                     # Zod validation schemas + TypeScript types
-│       │   └── <module>.dto.ts
-│       └── use-cases/               # Injectable use case classes
-│           └── <entity>.usecases.ts
+├── application/ # LAYER 2: Application
+│ └── <module>/
+│ ├── dto/ # Zod validation schemas + TypeScript types
+│ │ └── <module>.dto.ts
+│ └── use-cases/ # Injectable use case classes
+│ └── <entity>.usecases.ts
 │
-├── infrastructure/                  # LAYER 3: Infrastructure
-│   └── <module>/
-│       └── database/
-│           ├── entities/            # ORM mappers (Prisma → domain entity)
-│           │   └── <entity>.orm-entity.ts
-│           └── repositories/        # Prisma repository implementations
-│               └── <entity>.repository.impl.ts
+├── infrastructure/ # LAYER 3: Infrastructure
+│ └── <module>/
+│ └── database/
+│ ├── entities/ # ORM mappers (Prisma → domain entity)
+│ │ └── <entity>.orm-entity.ts
+│ └── repositories/ # Prisma repository implementations
+│ └── <entity>.repository.impl.ts
 │
-├── presentation/                    # LAYER 4: Presentation (outermost)
-│   └── <module>/
-│       ├── <module>.module.ts       # NestJS module definition
-│       ├── controllers/             # HTTP controllers
-│       │   └── <entity>.controller.ts
-│       └── providers/               # DI provider bindings
-│           └── <module>.providers.ts
+├── presentation/ # LAYER 4: Presentation (outermost)
+│ └── <module>/
+│ ├── <module>.module.ts # NestJS module definition
+│ ├── controllers/ # HTTP controllers
+│ │ └── <entity>.controller.ts
+│ └── providers/ # DI provider bindings
+│ └── <module>.providers.ts
 │
-└── shared/                          # Cross-cutting concerns
-    ├── constants/                   # DI tokens, audit action names
-    ├── dto/                         # PaginationQuery, ApiResponse
-    ├── enums/                       # Permission enums
-    ├── filters/                     # GlobalExceptionFilter
-    ├── interceptors/                # LoggingInterceptor, TransformInterceptor
-    ├── interfaces/                  # ICurrentUser, IJwtPayload, IPaginationMeta
-    ├── pipes/                       # ZodValidationPipe
-    └── utils/                       # PasswordUtil, PaginationUtil, StringUtil
-```
+└── shared/ # Cross-cutting concerns
+├── constants/ # DI tokens, audit action names
+├── dto/ # PaginationQuery, ApiResponse
+├── enums/ # Permission enums
+├── filters/ # GlobalExceptionFilter
+├── interceptors/ # LoggingInterceptor, TransformInterceptor
+├── interfaces/ # ICurrentUser, IJwtPayload, IPaginationMeta
+├── pipes/ # ZodValidationPipe
+└── utils/ # PasswordUtil, PaginationUtil, StringUtil
 
 #### Create folder structure based on the below code, run it on backend folder
 
-```
 $folders = @(
-    "src/domain",
-    "src/application",
-    "src/infrastructure",
-    "src/presentation",
-    "src/shared/constants",
-    "src/shared/dto",
-    "src/shared/enums",
-    "src/shared/filters",
-    "src/shared/interceptors",
-    "src/shared/interfaces",
-    "src/shared/pipes",
-    "src/shared/utils"
+"src/domain",
+"src/application",
+"src/infrastructure",
+"src/presentation",
+"src/shared/constants",
+"src/shared/dto",
+"src/shared/enums",
+"src/shared/filters",
+"src/shared/interceptors",
+"src/shared/interfaces",
+"src/shared/pipes",
+"src/shared/utils"
 )
 
 foreach ($folder in $folders) {
-    New-Item -ItemType Directory -Force $folder | Out-Null
+New-Item -ItemType Directory -Force $folder | Out-Null
 }
-```
 
 #### and for modules
 
-```
 $folders = @(
-    "src/domain/users/entities",
-    "src/domain/users/repositories",
-    "src/domain/users/services",
-    "src/application/users/dto",
-    "src/application/users/use-cases",
-    "src/infrastructure/users/database/entities",
-    "src/infrastructure/users/database/repositories",
-    "src/presentation/users/controllers",
-    "src/presentation/users/providers"
+"src/domain/users/entities",
+"src/domain/users/repositories",
+"src/domain/users/services",
+"src/application/users/dto",
+"src/application/users/use-cases",
+"src/infrastructure/users/database/entities",
+"src/infrastructure/users/database/repositories",
+"src/presentation/users/controllers",
+"src/presentation/users/providers"
 )
 
 foreach ($folder in $folders) {
-    New-Item -ItemType Directory -Force $folder | Out-Null
+New-Item -ItemType Directory -Force $folder | Out-Null
 }
-```
 
 ### 10.1.2 Clean Architecture Layers
 
 The backend follows **strict Clean Architecture** with dependency inversion. Dependencies only flow inward.
 
-```
 ┌──────────────────────────────────────────────────────────┐
-│  PRESENTATION LAYER                                       │
-│  Controllers, Modules, Guards, Decorators                 │
-│  (NestJS-specific — HTTP request/response handling)       │
-│  • Receives HTTP requests                                 │
-│  • Validates input via ZodValidationPipe                  │
-│  • Calls use cases                                        │
-│  • Returns response (auto-wrapped by TransformInterceptor)│
+│ PRESENTATION LAYER │
+│ Controllers, Modules, Guards, Decorators │
+│ (NestJS-specific — HTTP request/response handling) │
+│ • Receives HTTP requests │
+│ • Validates input via ZodValidationPipe │
+│ • Calls use cases │
+│ • Returns response (auto-wrapped by TransformInterceptor)│
 ├──────────────────────────────────────────────────────────┤
-│  APPLICATION LAYER                                        │
-│  Use Cases (Injectable classes) + DTOs (Zod schemas)      │
-│  • Each use case = one business operation                 │
-│  • Orchestrates: repo calls, audit logging, error throws  │
-│  • Depends on domain interfaces, NOT implementations      │
+│ APPLICATION LAYER │
+│ Use Cases (Injectable classes) + DTOs (Zod schemas) │
+│ • Each use case = one business operation │
+│ • Orchestrates: repo calls, audit logging, error throws │
+│ • Depends on domain interfaces, NOT implementations │
 ├──────────────────────────────────────────────────────────┤
-│  DOMAIN LAYER (innermost — zero framework dependencies)   │
-│  Entity interfaces, Repository interfaces, Domain Services│
-│  • Pure TypeScript — no NestJS, no Prisma imports         │
-│  • Defines WHAT operations exist, not HOW they work       │
-│  • Domain services contain pure business rules            │
+│ DOMAIN LAYER (innermost — zero framework dependencies) │
+│ Entity interfaces, Repository interfaces, Domain Services│
+│ • Pure TypeScript — no NestJS, no Prisma imports │
+│ • Defines WHAT operations exist, not HOW they work │
+│ • Domain services contain pure business rules │
 ├──────────────────────────────────────────────────────────┤
-│  INFRASTRUCTURE LAYER                                     │
-│  Prisma repository implementations + ORM mappers          │
-│  • Implements repository interfaces from domain layer     │
-│  • Talks to PostgreSQL via PrismaService                  │
-│  • Handles soft-delete filtering, audit fields            │
+│ INFRASTRUCTURE LAYER │
+│ Prisma repository implementations + ORM mappers │
+│ • Implements repository interfaces from domain layer │
+│ • Talks to PostgreSQL via PrismaService │
+│ • Handles soft-delete filtering, audit fields │
 ├──────────────────────────────────────────────────────────┤
-│  SHARED LAYER (cross-cutting)                             │
-│  Constants, DTOs, Filters, Interceptors, Pipes, Utils     │
-│  • Used by any layer                                      │
-│  • Contains framework-specific utilities                  │
+│ SHARED LAYER (cross-cutting) │
+│ Constants, DTOs, Filters, Interceptors, Pipes, Utils │
+│ • Used by any layer │
+│ • Contains framework-specific utilities │
 └──────────────────────────────────────────────────────────┘
-```
 
 #### Dependency Inversion in Practice
 
 Instead of use cases depending on Prisma repositories directly, we use **Symbol-based injection tokens**:
 
-```
-Domain layer defines:     IRegionRepository (interface)
+Domain layer defines: IRegionRepository (interface)
 Infrastructure implements: PrismaRegionRepository (class)
-Shared layer defines:      GEOGRAPHY_TOKENS.REGION_REPOSITORY (Symbol token)
-Providers file binds:      { provide: GEOGRAPHY_TOKENS.REGION_REPOSITORY, useClass: PrismaRegionRepository }
-Use case injects:          @Inject(GEOGRAPHY_TOKENS.REGION_REPOSITORY) private repo: IRegionRepository
-```
+Shared layer defines: GEOGRAPHY_TOKENS.REGION_REPOSITORY (Symbol token)
+Providers file binds: { provide: GEOGRAPHY_TOKENS.REGION_REPOSITORY, useClass: PrismaRegionRepository }
+Use case injects: @Inject(GEOGRAPHY_TOKENS.REGION_REPOSITORY) private repo: IRegionRepository
 
 This means you can swap Prisma for any other data source without changing domain or application layer code.
 
@@ -1316,63 +1318,59 @@ This means you can swap Prisma for any other data source without changing domain
 
 ### 10.1.3 Request Lifecycle
 
-```
 HTTP Request
-    │
-    ▼
+│
+▼
 ┌─ Global Guards (applied in order) ──────────────────┐
-│  1. JwtAuthGuard  — verify JWT (skip if @Public())  │
-│  2. RolesGuard    — check @Roles() (super_admin     │
-│                     bypasses)                        │
-│  3. PermissionsGuard — check @Permissions()          │
-│  4. ThrottlerGuard   — rate limiting                 │
+│ 1. JwtAuthGuard — verify JWT (skip if @Public()) │
+│ 2. RolesGuard — check @Roles() (super_admin │
+│ bypasses) │
+│ 3. PermissionsGuard — check @Permissions() │
+│ 4. ThrottlerGuard — rate limiting │
 └─────────────────────────────────────────────────────┘
-    │
-    ▼
+│
+▼
 ┌─ Controller Method ─────────────────────────────────┐
-│  @Query(new ZodValidationPipe(Schema)) → validates  │
-│  @Body(new ZodValidationPipe(Schema))  → validates  │
-│  @CurrentUser() → extracts user from JWT            │
-│  Calls use case → use case returns data             │
+│ @Query(new ZodValidationPipe(Schema)) → validates │
+│ @Body(new ZodValidationPipe(Schema)) → validates │
+│ @CurrentUser() → extracts user from JWT │
+│ Calls use case → use case returns data │
 └─────────────────────────────────────────────────────┘
-    │
-    ▼
+│
+▼
 ┌─ Global Interceptors ───────────────────────────────┐
-│  1. LoggingInterceptor  — logs method + duration    │
-│  2. TransformInterceptor — wraps in ApiResponseDto: │
-│     { success, message, data, timestamp }           │
+│ 1. LoggingInterceptor — logs method + duration │
+│ 2. TransformInterceptor — wraps in ApiResponseDto: │
+│ { success, message, data, timestamp } │
 └─────────────────────────────────────────────────────┘
-    │
-    ▼
+│
+▼
 ┌─ GlobalExceptionFilter (if error) ──────────────────┐
-│  Catches all exceptions → structured error response │
-│  { success: false, message, errors?, timestamp }    │
+│ Catches all exceptions → structured error response │
+│ { success: false, message, errors?, timestamp } │
 └─────────────────────────────────────────────────────┘
-    │
-    ▼
+│
+▼
 HTTP Response
-```
 
 ### 10.1.4 Database & Prisma
 
 **Schema location:** `prisma/schema.prisma`
 
 **Common model patterns:**
-
-```prisma
+/prisma
 model Example {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String   @db.VarChar(200)
-  code      String   @unique @db.VarChar(20)
-  isActive  Boolean  @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")       // Soft delete
-  createdBy String?  @db.Uuid @map("created_by")
-  updatedBy String?  @db.Uuid @map("updated_by")
-  @@map("examples")                             // Table name
+id String @id @default(uuid()) @db.Uuid
+name String @db.VarChar(200)
+code String @unique @db.VarChar(20)
+isActive Boolean @default(true) @map("is_active")
+createdAt DateTime @default(now()) @map("created_at")
+updatedAt DateTime @updatedAt @map("updated_at")
+deletedAt DateTime? @map("deleted_at") // Soft delete
+createdBy String? @db.Uuid @map("created_by")
+updatedBy String? @db.Uuid @map("updated_by")
+@@map("examples") // Table name
 }
-```
 
 **PrismaService helpers** (available in all repo implementations):
 
@@ -1412,7 +1410,8 @@ this.prisma.softDelete(); // → { deletedAt: new Date() }
 
 **All endpoints** return a consistent envelope:
 
-```jsonc
+```json
+
 // Success
 {
   "success": true,
@@ -1448,9 +1447,8 @@ this.prisma.softDelete(); // → { deletedAt: new Date() }
   ],
   "timestamp": "2026-03-28T10:00:00.000Z"
 }
-```
 
----
+```
 
 ### 10.1.8 Step-by-Step: Adding a New Backend Module
 
@@ -1461,6 +1459,7 @@ this.prisma.softDelete(); // → { deletedAt: new Date() }
 Edit `prisma/schema.prisma`:
 
 ```prisma
+
 model Warehouse {
   id          String    @id @default(uuid()) @db.Uuid
   name        String    @db.VarChar(200)
@@ -1480,13 +1479,16 @@ model Warehouse {
   @@index([kebeleId])
   @@map("warehouses")
 }
+
 ```
 
-Run migration:
+#### Run migration:
 
 ```bash
+
 npx prisma migrate dev --name add_warehouse
 npx prisma generate
+
 ```
 
 #### Step 2: Define DI Tokens
@@ -2042,6 +2044,7 @@ import { WarehouseModule } from './presentation/warehouse/warehouse.module';
   ],
   // ...
 })
+
 ```
 
 #### Step 8: Seed Permissions
@@ -2049,12 +2052,14 @@ import { WarehouseModule } from './presentation/warehouse/warehouse.module';
 In `prisma/seeds/seed.ts`, add `warehouse` permissions:
 
 ```typescript
+
 { module: 'warehouse', action: 'create' },
 { module: 'warehouse', action: 'read' },
 { module: 'warehouse', action: 'update' },
 { module: 'warehouse', action: 'delete' },
 { module: 'warehouse', action: 'export' },
 { module: 'warehouse', action: 'manage' },
+
 ```
 
 Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
@@ -2062,6 +2067,7 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
 #### Backend Module Checklist
 
 ```
+
 ✅ prisma/schema.prisma          — Model defined, migration run
 ✅ shared/constants/             — DI tokens
 ✅ domain/warehouse/entities/     — Entity + Response interfaces
@@ -2075,9 +2081,8 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
 ✅ presentation/warehouse/warehouse.module.ts — Module
 ✅ app.module.ts                 — Module imported
 ✅ Seeds                         — Permissions created
-```
 
----
+```
 
 ## 11. Authentication
 
@@ -2200,18 +2205,22 @@ Pagination
 ### 14.1 Before writing the users frontend, test:
 
     ```
+
     POST /users
     GET /users
     GET /users/:id
     PUT /users/:id
     DELETE /users/:id
     GET /users/lookup
+
     ```
 
 ### Using Swagger:
 
 ```
+
 http://localhost:4000/api/docs
+
 ```
 
 - Verify:
@@ -2230,8 +2239,10 @@ http://localhost:4000/api/docs
 
 ### 15.1. Create the Next.js project
 
-```
+```\
+
 npx create-next-app@latest frontend
+
 ```
 
 ### 15.2 Directory Structure
@@ -2260,6 +2271,7 @@ npx create-next-app@latest frontend
 ### 15.3 Directory Structure
 
 ```
+
 fms-frontend/src/
 ├── middleware.ts                    # NextAuth session check for all routes
 ├── app/
@@ -2327,11 +2339,13 @@ fms-frontend/src/
     │   ├── sidebar.store.ts       # Zustand (collapsed state)
     │   └── modal.store.ts         # Zustand (modal open/close)
     └── utils/cn.ts                # clsx + tailwind-merge
+
 ```
 
 ### 15.4 Clean Architecture Layers
 
 ```
+
 ┌─────────────────────────────────────────────────────────┐
 │  PRESENTATION LAYER (React Components)                   │
 │  Pages (app/), Components, Hooks, Guards                 │
@@ -2358,6 +2372,7 @@ fms-frontend/src/
 │  • UI state (sidebar, modals), not server state          │
 │  • Server state is managed by TanStack Query             │
 └─────────────────────────────────────────────────────────┘
+
 ```
 
 ### 15.4 Frontend Authentication
@@ -2419,12 +2434,14 @@ fms-frontend/src/
 The frontend **never** makes direct API calls to the NestJS backend. All API traffic flows through the Next.js BFF (Backend For Frontend) proxy:
 
 ```
+
 Browser (React)  ──HTTP──>  Next.js API Route (/api/v1/*)  ──HTTP──>  NestJS Backend (port 4000)
                             │
                             ├── Reads NextAuth session
                             ├── Injects Authorization: Bearer <token>
                             ├── Normalizes paginated responses
                             └── Returns to browser
+
 ```
 
 **Why BFF?**
@@ -2445,6 +2462,7 @@ Browser (React)  ──HTTP──>  Next.js API Route (/api/v1/*)  ──HTTP─
 **Frontend RBAC:**
 
 ```tsx
+
 // In any component — check permissions
 import { useAuth } from '@/presentation/hooks/useAuth';
 
@@ -2461,6 +2479,7 @@ import { PermissionGate } from '@/presentation/guards/PermissionGate';
 <PermissionGate permissions={["warehouse:read", "warehouse:update"]} requireAll>
   <EditForm />
 </PermissionGate>
+
 ```
 
 ### 15.7 Key Patterns & Components
@@ -2480,6 +2499,7 @@ The `CrudPage<T>` generic component is used across most CRUD pages. It provides:
 **Usage pattern in most pages:**
 
 ```tsx
+
 <CrudPage<WarehouseResponse>
   title="Warehouses"
   queryKey="warehouses"
@@ -2493,6 +2513,7 @@ The `CrudPage<T>` generic component is used across most CRUD pages. It provides:
     <WarehouseFormDialog warehouse={item} onClose={onClose} />
   )}
 />
+
 ```
 
 #### Infrastructure API Module Pattern
@@ -2543,8 +2564,6 @@ export const warehousesApi = {
 | Validation        | Zod            | Schema validation in form dialogs                      |
 
 **Rule:** Use TanStack Query for any data from the API. Use Zustand only for UI state that doesn't come from the server.
-
----
 
 ### Server data, use:
 
@@ -2855,6 +2874,7 @@ export default function WarehousesPage() {
 In `src/presentation/components/layout/AppSidebar.tsx`, add the warehouse link to the appropriate navigation category:
 
 ```typescript
+
 // Inside the navigation items array
 {
   label: "Warehouses",
@@ -2862,6 +2882,7 @@ In `src/presentation/components/layout/AppSidebar.tsx`, add the warehouse link t
   icon: WarehouseIcon,
   permission: "warehouse:read",
 },
+
 ```
 
 The sidebar automatically hides items the user doesn't have permission for.
@@ -2869,18 +2890,19 @@ The sidebar automatically hides items the user doesn't have permission for.
 #### Frontend Module Checklist
 
 ```
+
 ✅ domain/warehouse/entities/index.ts      — Request/Response types
 ✅ infrastructure/warehouse/api/            — API client module
 ✅ presentation/components/warehouse/       — Form dialog
 ✅ app/(authenticated)/warehouses/page.tsx  — Page component
 ✅ AppSidebar navigation entry              — Sidebar link
-```
 
----
+```
 
 ## 16. Order of Implementation
 
 ```
+
 1. BACKEND: Prisma Schema
    └── Define model → run migration → generate client
 
@@ -2920,6 +2942,7 @@ The sidebar automatically hides items the user doesn't have permission for.
 
 11. FRONTEND: Navigation
     └── AppSidebar  → Add nav entry with permission
+
 ```
 
 ### File Count Per Module
@@ -2932,8 +2955,6 @@ The sidebar automatically hides items the user doesn't have permission for.
 | Presentation   | 3-4 (controller + module + providers) | 2-3 (page + form dialog) |
 | Shared/Config  | 1-2 (tokens + seeds)                  | 0-1 (sidebar entry)      |
 | **Total**      | **~12-15 files**                      | **~4-6 files**           |
-
----
 
 ## 17. Environment Variables
 
@@ -2961,35 +2982,41 @@ The sidebar automatically hides items the user doesn't have permission for.
 | `NEXTAUTH_SECRET` | `your-nextauth-secret`         | NextAuth encryption secret |
 | `AUTH_SECRET`     | `your-auth-secret`             | NextAuth v5 secret         |
 
----
-
 ## 18. Database Migrations
 
 ### Creating a Migration
 
 ```bash
+
 cd fms-backend
 npx prisma migrate dev --name describe_your_change
+
 ```
 
 ### Applying Migrations (production)
 
 ```bash
+
 npx prisma migrate deploy
+
 ```
 
 ### Resetting Database (development only)
 
 ```bash
+
 npx prisma migrate reset --force
 # Then re-seed:
 npx ts-node prisma/seeds/seed.ts
+
 ```
 
 ### Viewing Data
 
 ```bash
+
 npx prisma studio  # Opens GUI at localhost:5555
+
 ```
 
 ### Migration Best Practices
@@ -3000,8 +3027,6 @@ npx prisma studio  # Opens GUI at localhost:5555
 - Every model needs: `id`, `createdAt`, `updatedAt`, `deletedAt`, `createdBy`, `updatedBy`
 - Use `@@map("table_name")` for snake_case table names
 - Use `@map("column_name")` for snake_case column names
-
----
 
 ## 19. Coding Conventions
 
@@ -3033,13 +3058,12 @@ npx prisma studio  # Opens GUI at localhost:5555
 | **Notifications**    | `toast.success()` / `toast.error()` from Sonner                   |
 | **Path alias**       | `@/*` maps to `src/*`                                             |
 
----
-
 ## 20. Common Patterns Reference
 
 ### Backend: Standard Repository Method
 
 ```typescript
+
 async findAll(query: any) {
   const where: any = { ...this.prisma.softDeleteFilter() };
   if (query.search) {
@@ -3056,6 +3080,7 @@ async findAll(query: any) {
   ]);
   return { items, total };
 }
+
 ```
 
 ### Backend: Standard Use Case
@@ -3086,6 +3111,7 @@ export class CreateEntityUseCase {
 ### Backend: Standard Controller Method
 
 ```typescript
+
 @Post()
 @Permissions('module:create')
 create(
@@ -3094,6 +3120,7 @@ create(
 ) {
   return this.createUseCase.execute(dto, user.id);
 }
+
 ```
 
 ### Frontend: Standard CrudPage
@@ -3150,8 +3177,6 @@ const mutation = useMutation({
   onError: (err) => toast.error(err?.response?.data?.message || "Failed"),
 });
 ```
-
----
 
 ## 21: Testing Strategy
 
@@ -3320,7 +3345,4 @@ const mutation = useMutation({
 | Add permission     | `seeds/seed.ts` + `shared/constants/`         | `AppSidebar` + `PermissionGate`                 |
 | Add navigation     | —                                             | `presentation/components/layout/AppSidebar.tsx` |
 
----
-
-_Last updated: September 2026_
-````
+Last updated: September 2026\_
