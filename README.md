@@ -335,6 +335,9 @@ Define in short about the project
 
     npm install @nestjs/jwt
 
+    npm ls @nestjs/config
+    npm install @nestjs/config
+
 #### Passport
 
     npm install @nestjs/passport passport
@@ -1174,6 +1177,7 @@ main()
 
 ### 10.1.1 Detail Directory Structure
 
+```
 backend/src/
 ├── main.ts # Bootstrap, global pipes/filters/interceptors
 ├── app.module.ts # Root module — imports all feature modules
@@ -1219,9 +1223,11 @@ backend/src/
 ├── interfaces/ # ICurrentUser, IJwtPayload, IPaginationMeta
 ├── pipes/ # ZodValidationPipe
 └── utils/ # PasswordUtil, PaginationUtil, StringUtil
+```
 
 #### Create folder structure based on the below code, run it on backend folder
 
+```
 $folders = @(
 "src/domain",
 "src/application",
@@ -1240,9 +1246,11 @@ $folders = @(
 foreach ($folder in $folders) {
 New-Item -ItemType Directory -Force $folder | Out-Null
 }
+```
 
 #### and for modules
 
+```
 $folders = @(
 "src/domain/users/entities",
 "src/domain/users/repositories",
@@ -1258,11 +1266,13 @@ $folders = @(
 foreach ($folder in $folders) {
 New-Item -ItemType Directory -Force $folder | Out-Null
 }
+```
 
 ### 10.1.2 Clean Architecture Layers
 
 The backend follows **strict Clean Architecture** with dependency inversion. Dependencies only flow inward.
 
+```
 ┌──────────────────────────────────────────────────────────┐
 │ PRESENTATION LAYER │
 │ Controllers, Modules, Guards, Decorators │
@@ -1295,16 +1305,21 @@ The backend follows **strict Clean Architecture** with dependency inversion. Dep
 │ • Used by any layer │
 │ • Contains framework-specific utilities │
 └──────────────────────────────────────────────────────────┘
+```
 
 #### Dependency Inversion in Practice
 
 Instead of use cases depending on Prisma repositories directly, we use **Symbol-based injection tokens**:
 
-Domain layer defines: IRegionRepository (interface)
-Infrastructure implements: PrismaRegionRepository (class)
-Shared layer defines: GEOGRAPHY_TOKENS.REGION_REPOSITORY (Symbol token)
-Providers file binds: { provide: GEOGRAPHY_TOKENS.REGION_REPOSITORY, useClass: PrismaRegionRepository }
-Use case injects: @Inject(GEOGRAPHY_TOKENS.REGION_REPOSITORY) private repo: IRegionRepository
+##### Domain layer defines: IRegionRepository (interface)
+
+##### Infrastructure implements: PrismaRegionRepository (class)
+
+##### Shared layer defines: GEOGRAPHY_TOKENS.REGION_REPOSITORY (Symbol token)
+
+##### Providers file binds: { provide: GEOGRAPHY_TOKENS.REGION_REPOSITORY, useClass: PrismaRegionRepository }
+
+##### Use case injects: @Inject(GEOGRAPHY_TOKENS.REGION_REPOSITORY) private repo: IRegionRepository
 
 This means you can swap Prisma for any other data source without changing domain or application layer code.
 
@@ -1318,6 +1333,7 @@ This means you can swap Prisma for any other data source without changing domain
 
 ### 10.1.3 Request Lifecycle
 
+```
 HTTP Request
 │
 ▼
@@ -1358,6 +1374,8 @@ HTTP Response
 **Schema location:** `prisma/schema.prisma`
 
 **Common model patterns:**
+```
+
 /prisma
 model Example {
 id String @id @default(uuid()) @db.Uuid
@@ -1372,6 +1390,8 @@ updatedBy String? @db.Uuid @map("updated_by")
 @@map("examples") // Table name
 }
 
+````
+
 **PrismaService helpers** (available in all repo implementations):
 
 ```typescript
@@ -1379,7 +1399,7 @@ this.prisma.softDeleteFilter(); // → { deletedAt: null }
 this.prisma.auditCreate(userId); // → { createdBy: userId, updatedBy: userId }
 this.prisma.auditUpdate(userId); // → { updatedBy: userId }
 this.prisma.softDelete(); // → { deletedAt: new Date() }
-```
+````
 
 ### 10.1.5 Authentication & Authorization
 

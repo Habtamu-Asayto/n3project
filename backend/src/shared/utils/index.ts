@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { RBAC_CONSTANTS } from '../constants/index.js';
+import { RBAC_CONSTANTS } from '../constants';
 
 export class PasswordUtil {
   static async hash(password: string): Promise<string> {
