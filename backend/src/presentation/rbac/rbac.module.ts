@@ -8,7 +8,7 @@ import {
   AuthController,
   UserController,
   RoleController,
-  PermissionController,
+  PermissionController, 
   AuditController,
 } from './controllers';
 

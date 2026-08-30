@@ -30,9 +30,8 @@ async function bootstrap() {
       .map((r) => r.trim()),
   });
   const port = configService.get<number>('PORT') || 4000;
-  console.log("Tets === "+port);
   
-  const apiPrefix = configService.get<string>('API_PREFIX') || 'api/v1';
+  const apiPrefix = configService.get<string>('API_PREFIX') || 'api';
   const frontendUrl =
     configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
 

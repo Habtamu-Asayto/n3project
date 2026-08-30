@@ -57,10 +57,10 @@ Define in short about the project
 | Technology         | Version | Purpose                         |
 | ------------------ | ------- | ------------------------------- |
 | NestJS             | 11.x    | Application framework           |
-| TypeScript         | 5.9     | Language                        |
-| Prisma             | 7.10.x  | ORM + migrations                |
+| TypeScript         | 5.7     | Language                        |
+| Prisma             | 7.6.x   | ORM + migrations                |
 | PostgreSQL         | 16.x    | Database                        |
-| Zod                | 4.5.x   | Runtime DTO validation          |
+| Zod                | 4.3.x   | Runtime DTO validation          |
 | Passport + JWT     | —       | Authentication                  |
 | Swagger            | —       | API documentation (`/api/docs`) |
 | Helmet + Throttler | —       | Security + rate limiting        |
@@ -165,7 +165,7 @@ Define in short about the project
                     Next.js 16
                      Frontend
                           │
-                     /api/v1/*
+                     /api/*
                           │
                           ▼
                     BFF Proxy
@@ -287,13 +287,66 @@ Define in short about the project
 
 ---
 
-    node_modules/
-    .env
-    .env.local
-    dist/
-    .next/
-    coverage/
-    *.log
+```
+# compiled output
+/dist
+/node_modules
+/build
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# temp directory
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+/src/generated/prisma
+```
 
 - after the basic project structure works , create the first commit
   git add .
@@ -314,13 +367,13 @@ Define in short about the project
 
 ### 8.2 install libraries inside of backend folder
 
-#### dotenv
+#### ConfigService
 
-    npm install dotenv
+    npm install @nestjs/config
 
 #### Prisma
 
-    npm install prisma@7.5.0 @prisma/client@7.5.0
+    npm install prisma@7.6.0 @prisma/client@7.6.0
 
 #### PostgreSQL driver
 
@@ -368,7 +421,7 @@ Define in short about the project
 
 #### To Install everything at once
 
-    npm install dotenv prisma @prisma/client zod @nestjs/jwt @nestjs/passport passport passport-jwt helmet @nestjs/throttler
+    npm install List-All-Libraries
 
 #### Initialize Prisma
 
@@ -419,7 +472,6 @@ Define in short about the project
 - lets start by designing the data model. we can start with-
   RBAC
   Geography
-  Master Data
 
 - conceptual dependency
   RBAC
@@ -1135,45 +1187,43 @@ main()
     ├── presentation/
     └── shared/
 
-### domain - The business is:
+### 10.1.1 Each folder does
 
-    Entity
-    Repository interface
-    Business rules
-
-### application, which does:
-
-    Create Farmer
-    Update Farmer
-    Get Farmer
-    Delete Farmer
-
-### infrastructure- How the application accesses external systems.
-
-    Prisma
-    PostgreSQL
-    Repository implementations
-
-### presentation - How users communicate with the backend.
-
-    HTTP
-    Controllers
-    NestJS modules
-
-### Dependency Flow, the flow is
-
-    Presentation
-    	  ↓
-    Application
-    	  ↓
-    Domain
-
-- Instead of domain knows Prisma directily , Infrastructure must implements domain contracts
-  Infrastructure
-  ↓
-  implements
-  ↓
-  Domain interfaces
+```
+    src/
+    │
+    ├── domain/
+    │   └── Business rules and core entities
+    │      └── <Module>
+    │         └── entities
+    │         └── repositories
+    │         └── services
+    │
+    ├── application/
+    │   └── Use cases / application logic
+    │      └── <Module>
+    │         └── dto
+    │         └── use-cases
+    │
+    ├── infrastructure/
+    │   └── Database, Prisma, JWT, external APIs, etc.
+    │      └── <Module>
+    │         └── database
+    │            └── entities
+    │            └── repositories
+    │
+    ├── presentation/
+    │   └── Controllers, API DTOs, guards, pipes
+    │      └── <Module>
+    │         └── controller
+    │          └── provider
+    │         └── decorators (for RBAC)
+    │          └── guards (for RBAC)
+    │         └── strategies (for RBAC)
+    │
+    └── shared/
+        └── Common utilities used by multiple layers
+```
 
 ### 10.1.1 Detail Directory Structure
 
@@ -1266,6 +1316,41 @@ $folders = @(
 foreach ($folder in $folders) {
 New-Item -ItemType Directory -Force $folder | Out-Null
 }
+```
+
+### Dependency Flow, the flow is
+
+```
+    Request
+      ↓
+    presentation/
+      ↓
+    application/
+      ↓
+    domain/
+      ↓
+    infrastructure/
+      ↓
+    Database / External Services
+```
+
+### Dependency direction
+
+```
+presentation ──────→ application ──────→ domain
+      │                    │
+      │                    ↓
+      └──────────────→ infrastructure
+```
+
+- Instead of domain knows Prisma directly , Infrastructure must implements domain contracts
+
+```
+  Infrastructure
+  ↓
+  implements
+  ↓
+  Domain interfaces
 ```
 
 ### 10.1.2 Clean Architecture Layers
@@ -1368,14 +1453,15 @@ HTTP Request
 │
 ▼
 HTTP Response
+```
 
 ### 10.1.4 Database & Prisma
 
 **Schema location:** `prisma/schema.prisma`
 
 **Common model patterns:**
-```
 
+```
 /prisma
 model Example {
 id String @id @default(uuid()) @db.Uuid
@@ -1389,8 +1475,7 @@ createdBy String? @db.Uuid @map("created_by")
 updatedBy String? @db.Uuid @map("updated_by")
 @@map("examples") // Table name
 }
-
-````
+```
 
 **PrismaService helpers** (available in all repo implementations):
 
@@ -1399,7 +1484,7 @@ this.prisma.softDeleteFilter(); // → { deletedAt: null }
 this.prisma.auditCreate(userId); // → { createdBy: userId, updatedBy: userId }
 this.prisma.auditUpdate(userId); // → { updatedBy: userId }
 this.prisma.softDelete(); // → { deletedAt: new Date() }
-````
+```
 
 ### 10.1.5 Authentication & Authorization
 
@@ -2108,6 +2193,8 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
 
 - Authentication should be built before ordinary business modules.
 - Architecture
+
+```
   Frontend
   │
   │ credentials
@@ -2123,10 +2210,13 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
   ├── Load roles
   ├── Load permissions
   └── Create JWT
+```
 
 ## 12. RBAC
 
 - Design
+
+```
   User
   │
   ├── Roles
@@ -2134,11 +2224,17 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
   │ └── Permissions
   │
   └── Geography scope
+```
 
 - Permission format:
+
+```
   module:action
+```
 
 - Examples:
+
+```
   users:read
   users:create
   users:update
@@ -2148,8 +2244,11 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
   farmer:create
 
   demand:approve
+```
 
 - Then implement:
+
+```
   JwtAuthGuard
   RolesGuard
   PermissionsGuard
@@ -2159,15 +2258,21 @@ Re-run seeds: `npx ts-node prisma/seeds/seed.ts`
   @Roles()
   @Permissions()
   @CurrentUser()
+```
 
 Test RBAC
 
 ### Build the First Complete Backend Module
 
 - Now build
+
+```
   users/warehouses
+```
 
 it demonstrates:
+
+```
 Prisma
 ↓
 Repository
@@ -2183,46 +2288,47 @@ Permission
 Audit
 ↓
 Pagination
+```
 
-## 13. Summarys Users Backend Development Order
+### 13. Summary Users Backend Development Order
 
-### Step 1: Prisma model
+#### Step 1: Prisma model
 
-### Step 2: Migration
+#### Step 2: Migration
 
-### Step 3: Domain entity.
+#### Step 3: Domain entity.
 
-### Step 4: Repository interface.
+#### Step 4: Repository interface.
 
-### Step 5: DI token.
+#### Step 5: DI token.
 
-### Step 6: DTO/Zod schema.
+#### Step 6: DTO/Zod schema.
 
-### Step 7: Use cases.
+#### Step 7: Use cases.
 
-### Step 8: Mapper.
+#### Step 8: Mapper.
 
-### Step 9: Repository implementation.
+#### Step 9: Repository implementation.
 
-### Step 10: Controller.
+#### Step 10: Controller.
 
-### Step 11: Providers.
+#### Step 11: Providers.
 
-### Step 12: Module.
+#### Step 12: Module.
 
-### Step 13: Register module.
+#### Step 13: Register module.
 
-### Step 14: Permissions.
+#### Step 14: Permissions.
 
-### Step 15: Audit.
+#### Step 15: Audit.
 
-### Step 16: Swagger.
+#### Step 16: Swagger.
 
-### Step 17: Test API.
+#### Step 17: Test API.
 
-## 14. Test Backend Before Frontend
+### 14. Test Backend Before Frontend
 
-### 14.1 Before writing the users frontend, test:
+#### 14.1 Before writing the users frontend, test:
 
     ```
 
@@ -2244,6 +2350,8 @@ http://localhost:4000/api/docs
 ```
 
 - Verify:
+
+```
   Authentication
   Validation
   Authorization
@@ -2254,19 +2362,21 @@ http://localhost:4000/api/docs
   Audit logging
   Database persistence
   Error handling
+```
 
-## 15. Frontend Architecture (Next.js)
+### 15. Frontend Architecture (Next.js)
 
-### 15.1. Create the Next.js project
+#### 15.1. Create the Next.js project
 
-```\
+```
 
 npx create-next-app@latest frontend
 
 ```
 
-### 15.2 Directory Structure
+#### 15.2 Directory Structure
 
+```
     frontend/
     └── src/
     	├── app/
@@ -2274,8 +2384,11 @@ npx create-next-app@latest frontend
     	├── infrastructure/
     	├── presentation/
     	└── shared/
+```
 
 - App will be, and (authenticated) is just a group
+
+```
   app/
   ├── login/
   │ └── page.tsx
@@ -2287,11 +2400,11 @@ npx create-next-app@latest frontend
   ├── layout.tsx
   ├── dashboard/
   └── users/
-
-### 15.3 Directory Structure
-
 ```
 
+#### 15.3 Directory Structure
+
+```
 fms-frontend/src/
 ├── middleware.ts                    # NextAuth session check for all routes
 ├── app/
@@ -2398,6 +2511,8 @@ fms-frontend/src/
 ### 15.4 Frontend Authentication
 
 - Implement:
+
+```
   Login
   ↓
   NextAuth
@@ -2407,49 +2522,72 @@ fms-frontend/src/
   Middleware
   ↓
   Authenticated layout
+```
 
 - Then:
+
+```
   useAuth()
+```
 
 - provides:
+
+```
   user
   roles
   permissions
   isSuperAdmin
   hasPermission()
+```
 
-### 15.5. BFF
+#### 15.5. BFF
 
 - Instead of:
+
+```
   Browser ──────────────> NestJS
+```
+
 - use:
+
+```
   Browser
   │
   ▼
   Next.js
-  /api/v1/\*
+  /api/\*
   │
   ▼
   BFF
   │
   ▼
   NestJS
+```
 
 - The browser therefore does:
-  GET /api/v1/warehouses
+
+```
+  GET /api/v1/users
+```
 
 - rather than:
-  GET http://localhost:4000/api/v1/warehouses
+
+```
+  GET http://localhost:4000/api/users/
+```
 
 - The BFF handles:
+
+```
   session
   JWT
   authorization header
   backend URL
   response handling
   401 handling
+```
 
-### 15.5.1 BFF Proxy Pattern
+#### 15.5.1 BFF Proxy Pattern
 
 The frontend **never** makes direct API calls to the NestJS backend. All API traffic flows through the Next.js BFF (Backend For Frontend) proxy:
 
@@ -2471,7 +2609,7 @@ Browser (React)  ──HTTP──>  Next.js API Route (/api/v1/*)  ──HTTP─
 - Centralized response normalization
 - Same-origin API calls (no CORS issues in browser)
 
-### 15.6 Authentication & RBAC
+#### 15.6 Authentication & RBAC
 
 **NextAuth v5** handles authentication:
 
@@ -2502,9 +2640,9 @@ import { PermissionGate } from '@/presentation/guards/PermissionGate';
 
 ```
 
-### 15.7 Key Patterns & Components
+#### 15.7 Key Patterns & Components
 
-#### CrudPage Component
+##### CrudPage Component
 
 The `CrudPage<T>` generic component is used across most CRUD pages. It provides:
 
@@ -2653,14 +2791,14 @@ export const warehousesApi = {
 
 ## 15.10 Step-by-Step: Adding a New Frontend Module
 
-> **Example:** Adding a `Warehouse` module (matching the backend module from Section 4.8).
+> **Example:** Adding a `users` module (matching the backend module from Section 4.8).
 
 #### Step 1: Domain Layer — Entity Types
 
-**`src/domain/warehouse/entities/index.ts`**
+**`src/domain/users/entities/index.ts`**
 
 ```typescript
-export interface WarehouseResponse {
+export interface UsersResponse {
   id: string;
   name: string;
   code: string;
@@ -2672,7 +2810,7 @@ export interface WarehouseResponse {
   updatedAt: string;
 }
 
-export interface CreateWarehouseRequest {
+export interface CreateUsersRequest {
   name: string;
   code: string;
   location?: string;
@@ -2681,7 +2819,7 @@ export interface CreateWarehouseRequest {
   kebeleId: string;
 }
 
-export interface UpdateWarehouseRequest {
+export interface UpdateUsersRequest {
   name?: string;
   code?: string;
   location?: string;
@@ -2693,7 +2831,7 @@ export interface UpdateWarehouseRequest {
 
 #### Step 2: Infrastructure Layer — API Client
 
-**`src/infrastructure/warehouse/api/warehouse.api.ts`**
+**`src/infrastructure/users/api/users.api.ts`**
 
 ```typescript
 import api from "../../rbac/api/api-client";
@@ -3365,4 +3503,4 @@ const mutation = useMutation({
 | Add permission     | `seeds/seed.ts` + `shared/constants/`         | `AppSidebar` + `PermissionGate`                 |
 | Add navigation     | —                                             | `presentation/components/layout/AppSidebar.tsx` |
 
-Last updated: September 2026\_
+Last updated: September 2026
