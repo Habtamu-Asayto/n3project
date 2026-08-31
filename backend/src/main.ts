@@ -31,7 +31,7 @@ async function bootstrap() {
   });
   const port = configService.get<number>('PORT') || 4000;
   
-  const apiPrefix = configService.get<string>('API_PREFIX') || 'api';
+  const apiPrefix = configService.get<string>('API_PREFIX') || 'api/v1';
   const frontendUrl =
     configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
 

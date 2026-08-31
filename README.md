@@ -227,6 +227,7 @@ Define in short about the project
 
 - before prisma understand PostgreSQL architecture
 
+```
   PostgreSQL Server
   │
   ▼
@@ -237,8 +238,11 @@ Define in short about the project
   │
   ▼
   NestJS
+```
 
 - Lets use docker for postgresql, by creating docker-compose.yml under root folder.
+
+```
   Docker
   │
   └── PostgreSQL container
@@ -251,6 +255,7 @@ Define in short about the project
   frontend/
   backend/
   docker-compose.yml
+```
 
 #### and put for docker-compose.yml
 
@@ -470,10 +475,15 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 ### Design the Database Before Business Modules
 
 - lets start by designing the data model. we can start with-
+
+```
   RBAC
   Geography
+```
 
 - conceptual dependency
+
+```
   RBAC
   │
   └── Users
@@ -488,11 +498,13 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
   └── Zone
   └── Woreda
   └── Kebele
+```
 
 ### Database Modeling Rules
 
 - Before creating models, define rules. Every major entity should have:
 
+```
   id
   createdAt
   updatedAt
@@ -507,8 +519,11 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
   @@map("users")
 
   ***
+```
 
 - decide
+
+```
   UUID strategy
   foreign keys
   cascade behavior
@@ -519,10 +534,13 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
   audit fields
   timestamps
   enum strategy
+```
 
 ### Create Database ERD
 
 - Before writing Prisma models, create an ERD. which helps as to design Prisma schema much easier.like below-
+
+```
   Region
   │
   └──< Zone
@@ -532,6 +550,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
   └──< Kebele
   │
   └──< Farmer
+```
 
 ### Create your first database model
 
@@ -1121,6 +1140,10 @@ main()
 
 - later i may use : npx prisma migrate dev --name add_model_name
 
+#### if error occur's
+
+    npx prisma migrate reset
+
 #### Then->
 
     npx prisma generate
@@ -1137,6 +1160,10 @@ main()
 #### We can also check the postgresql on docker using window powershell
 
     docker exec -it n3-postgres psql -U postgres -d n3_db
+
+#### Exit
+
+    \q
 
 ##### List Database
 
@@ -2405,7 +2432,7 @@ npx create-next-app@latest frontend
 #### 15.3 Directory Structure
 
 ```
-fms-frontend/src/
+frontend/src/
 ├── middleware.ts                    # NextAuth session check for all routes
 ├── app/
 │   ├── globals.css                 # Tailwind v4 + shadcn theme tokens
@@ -2474,6 +2501,20 @@ fms-frontend/src/
     └── utils/cn.ts                # clsx + tailwind-merge
 
 ```
+
+### Remove the existing installation:
+
+    Remove-Item -Recurse -Force node_modules
+    Remove-Item -Force package-lock.json
+
+### Install libraries
+
+#### useSession
+
+```
+  npm install next-auth
+```
+
 
 ### 15.4 Clean Architecture Layers
 
@@ -2573,7 +2614,7 @@ fms-frontend/src/
 - rather than:
 
 ```
-  GET http://localhost:4000/api/users/
+  GET http://localhost:4000/api/v1/users/
 ```
 
 - The BFF handles:
