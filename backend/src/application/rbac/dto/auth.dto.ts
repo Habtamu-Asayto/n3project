@@ -12,7 +12,7 @@ export const RefreshTokenSchema = z.object({
 
 export const ForgotPasswordSchema = z.object({
   mobileNumber: z.string().min(10, 'Valid mobile number is required').max(15),
-});
+}); 
 
 export const ChangePasswordSchema = z
   .object({

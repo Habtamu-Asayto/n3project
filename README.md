@@ -359,6 +359,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 ## 8. Backend Initialization
 
+### Part 1
+
 ### 8.1 build NestJS
 
     backend/
@@ -371,6 +373,10 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
     √ Which module system would you like to use? ### ESM (ES Modules)         [ with vitest ]
 
 ### 8.2 install libraries inside of backend folder
+
+✅ Remove-Item -Recurse -Force node_modules
+✅ Remove-Item -Force package-lock.json
+✅ npm install
 
 #### ConfigService
 
@@ -436,29 +442,319 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
     npx prisma validate
 
-## 9. Prisma Setup
+## Remove the default demo code
 
-### The structure should be
+### Delete:
+
+```
+src/app.controller.ts
+src/app.controller.spec.ts
+src/app.service.ts
+```
+
+### Then change app.module.ts
+
+```
+import { Module } from '@nestjs/common';
+
+@Module({
+  imports: [],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}
+
+```
+
+### create .env on backend and put below
+
+```
+  PORT=4000
+  NODE_ENV=development
+  API_PREFIX=api/v1
+```
+
+- The install
+
+```
+npm install @nestjs/config
+```
+
+### Load environment variables
+- Load .env environments by updating app.module.ts into:
+```
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,       // it is mandatory
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+- Now other modules can inject ConfigService without importing ConfigModule repeatedly. use is on main.ts
+
+### Use ConfigService in main.ts
+```
+import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
+
+  const port = configService.get<number>('PORT', 4000);
+
+  await app.listen(port);
+}
+
+bootstrap();
+```
+
+## Add an API prefix
+- It must be versioned API endpoints such as Like-/api/v1/regions
+
+- Add to main.ts:
+
+```
+app.setGlobalPrefix(
+  configService.get<string>('API_PREFIX', 'api/v1'),
+);
+```
+- Now our route(@Get()) becomes : GET /api/v1/... instead of GET /
+
+## Add global validation
+- Use class-validator, class-transformer and ValidationPipe for global validation. must be compatible version with nestjs and others....
+``` 
+npm install class-validator class-transformer 
+```
+
+### Update src/main.ts by adding ValidationPipe 
+
+```
+import { ValidationPipe } from '@nestjs/common';
+
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true, // unexpected properties can be stripped from the validated object.
+    transform: true, //It allows Nest/class-transformer to transform incoming values according to DTO metadata.
+  }),
+);
+```
+
+## Test the backend run's 
+npm run start
+
+- Must get: 404, because haven't controller 
+
+### Part 2
+
+### Let's create a tiny health endpoint
+
+- create src/health.controller.ts, and add :
+
+```
+  import { Controller, Get } from '@nestjs/common';
+
+@Controller('health')
+export class HealthController {
+  @Get()
+  check() {
+    return {
+      status: 'ok',
+    };
+  }
+}
+``` 
+- Then register it on app.module.ts: 
+
+```
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { HealthController } from './health.controller';
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
+  controllers: [HealthController],
+})
+export class AppModule {}
+
+```
+
+### Rerun and test
+
+- Test URL : GET http://localhost:4000/api/v1/health
+
+- if it was not working , update tsconfig.json
+
+```
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "isolatedModules": false,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": false,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+```
+
+### Add Swagger 
+
+- install it 
+
+```
+npm install @nestjs/swagger
+```
+
+- Then add it on main.ts:
+
+```
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+```
+
+- also add below before app.listen():
+
+```
+const swaggerConfig = new DocumentBuilder()
+  .setTitle('N3 Learning API')
+  .setDescription('Learning project API')
+  .setVersion('1.0')
+  .build();
+
+const document = SwaggerModule.createDocument(
+  app,
+  swaggerConfig,
+);
+
+SwaggerModule.setup('api/docs', app, document);
+```
+
+## Part 3 - Database foundation: PostgreSQL + Docker + Prisma.
+
+### Check docker existed
+
+  ```
+  docker --version
+  docker compose version
+  ```
+### Create docker-compose.yml
+- Create it on root folder, and add :
+
+```
+services:
+  postgres:
+    image: postgres:16
+    container_name: n2p-learning
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: n2p_db
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+```
+- Start PostgreSQL on the folder that docker-compose.yml exists
+
+```
+docker compose up -d
+
+```
+
+- Then the container immediately created on the docker, check it by:
+
+```
+ docker ps
+
+ ```
+
+ - Verify PostgreSQL and can inspect the logs:
+
+ ```
+ docker logs n2p-learning
+ ```
+
+### Introduce & Prisma Setup
+
+- Prisma is an ORM/toolkit for working with databases from application code.
+
+- Instead of manually writing SQL(SELECT * FROM users WHERE id = 1;) everywhere, we can eventually write TypeScript like:
+
+```
+prisma.user.findUnique({
+  where: {
+    id: 1,
+  },
+});
+```
+
+### Install Prisma
+
+```
+npm install @prisma/client@7.6.0 @prisma/adapter-pg@7.5.0 pg
+npm install -D prisma@7.6.0
+
+```
+
+### Initialize prisma
+
+```
+npx prisma init
+
+```
+
+### Then The structure should be setted up
 
     backend/
     │
     ├── prisma/
-    │   └── schema.prisma
+    │   └── schema.prisma  - which is not is not the database itself.
     │
-    ├── prisma.config.ts
+    ├── prisma.config.ts - if prisma7.config.ts created renamed it.
     │
     ├── .env
     └── package.json
 
-### create .env on backend and put below
+- .env should contain:
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n2p_db?schema=public"
 
-    PORT=4000
-    DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n3_db?schema=public"
+-  on prisma.config.ts
 
-- Now Prisma can connect to PostgreSQL.
-
-### on prisma.config.ts
-
+  ```
     import "dotenv/config";
     import { defineConfig } from "prisma/config";
 
@@ -471,6 +767,275 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
         url: process.env.DATABASE_URL!,
       },
     });
+  ```
+- Now Prisma can connect to PostgreSQL.
+
+### Manage Prisma schema
+
+- open backend/prisma/schema.prisma, and add:
+
+```
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+  model User {
+    id        Int      @id @default(autoincrement())
+    name      String
+    email     String   @unique
+    createdAt DateTime @default(now())
+  }
+
+```
+
+- Move to migration 
+
+```
+npx prisma migrate dev --name init
+```
+
+- Then the same SQL table must be created prisma/migrations.sql
+
+- Generate Prisma Client
+
+```
+npx prisma generate
+```
+
+- Verify the database visually by running
+
+```
+npx prisma studio
+
+```
+
+- Verify from PostgreSQL itself
+
+```
+docker exec -it n2p-learning psql -U postgres -d n2p_db
+
+\dt or SELECT * FROM "User";
+
+\q
+
+```
+
+## 4. Clean Architecture Foundation
+-This clean architecture used to - Business rules should not depend on external technologies. it makes below
+
+```
+                    External World
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+      HTTP            Prisma          PostgreSQL
+        │                │                │
+        ▼                ▼                ▼
+┌──────────────────────────────────────────────┐
+│              Application                     │
+│                                              │
+│              Domain                          │
+│                                              │
+└──────────────────────────────────────────────┘
+
+```
+
+- The inner logic should be protected from the outside world.
+
+### There fore Our four main layers becomes
+
+```
+src/
+├── domain/
+├── application/
+├── infrastructure/
+└── presentation/
+```
+ 
+
+### Clean Architecture Layers
+
+The backend follows **strict Clean Architecture** with dependency inversion. Dependencies only flow inward.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ PRESENTATION LAYER("What came from the outside?") │
+│ Controllers, Modules, Guards, Decorators │
+│ (NestJS-specific — HTTP request/response handling) │
+│ • Receives HTTP requests │
+│ • Validates input via ZodValidationPipe │
+│ • Calls use cases │
+│ • Returns response (auto-wrapped by TransformInterceptor)│
+├──────────────────────────────────────────────────────────┤
+│ APPLICATION LAYER ("What does the system need to do?")│
+│ Use Cases (Injectable classes) + DTOs (Zod schemas) │
+│ • Each use case = one business operation │
+│ • Orchestrates: repo calls, audit logging, error throws │
+│ • Depends on domain interfaces, NOT implementations │
+├──────────────────────────────────────────────────────────┤
+│ DOMAIN LAYER (innermost — zero framework dependencies)-"What are the business rules?" │
+│ Entity interfaces, Repository interfaces, Domain Services│
+│   • Pure TypeScript — no NestJS, no Prisma imports │
+│   • Defines WHAT operations exist, not HOW they work │
+│   • Domain services represents the business concepts and rules │
+│   • Don't care about whether we use PostgreSQL, Prisma, MongoDB or MySQL│
+├──────────────────────────────────────────────────────────┤
+│ INFRASTRUCTURE LAYER ("How do we technically implement it?")│
+│ Prisma repository implementations + ORM mappers │
+│ • Implements repository interfaces from domain layer │
+│ • Talks to PostgreSQL via PrismaService │
+│ • Handles soft-delete filtering, audit fields │
+├──────────────────────────────────────────────────────────┤
+│ SHARED LAYER (cross-cutting) │
+│ Constants, DTOs, Filters, Interceptors, Pipes, Utils │
+│ • Used by any layer │
+│ • Contains framework-specific utilities │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Lets start innermost layer - Domain
+
+- Create - Create: backend/src/domain/
+
+- Thing belong to domain (Entities, Value Objects, Repository interfaces, Domain rules, Domain services)
+
+- Domain didn't know about Prisma
+
+- Instead of Domain -> Prisma, the dependency point is:
+
+```
+Domain -> Application -> Infrastructure
+```
+
+### Second: Application
+
+- Now create: 
+
+```
+backend/src/application/
+```
+
+- contains use cases, for doing (Create Region , Get Region, Get All Regions, Update Region, Delete Region)
+
+### Third: Infrastructure
+
+- Create: 
+
+```
+backend/src/infrastructure/
+
+```
+
+- This is where technology-specific implementations live.
+- This Layer Knows(Prisma, PostgreSQL, Redis, External APIs, File storage , Email providers)
+
+### Fourth: Presentation
+
+- Create : 
+
+```
+    backend/src/presentation/`
+```
+
+- This is the interface through which external clients interact with the application.
+
+### Shared
+
+- contains things that genuinely belong across multiple areas.
+
+### Our final Architecture becomes
+
+```
+                   CLIENT
+                     │
+                     │ HTTP
+                     ▼
+             ┌───────────────┐
+             │ Presentation  │
+             │  Controller   │
+             └───────┬───────┘
+                     │
+                     ▼
+             ┌───────────────┐
+             │ Application   │
+             │   Use Case    │
+             └───────┬───────┘
+                     │
+                     ▼
+             ┌───────────────┐
+             │    Domain     │
+             │ Business Rule │
+             └───────▲───────┘
+                     │
+                     │ implements
+                     │
+             ┌───────┴───────┐
+             │Infrastructure │
+             │    Prisma     │
+             └───────┬───────┘
+                     │
+                     ▼
+                PostgreSQL
+
+```
+
+## Build the Region Backend
+- complete flow becomes
+
+```
+HTTP Request
+     ↓
+Controller
+     ↓
+Use Case
+     ↓
+Domain
+     ↓
+Repository Interface
+     ↓
+Prisma Repository
+     ↓
+Prisma
+     ↓
+PostgreSQL
+
+```
+
+- Lets start with:
+```
+POST /api/v1/regions
+```
+
+### First create the Region database model
+- Open: backend/prisma/schema.prisma, and add:
+
+```
+model Region {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+```
+
+Use UUID instead of integer making harder to guess and work well in distributed systems.
+
+#### Create the migration
+
+```
+npx prisma migrate dev --name add_region
+```
+ 
+ Then verify it in both ways.
+
+ ### Now the interesting part: Domain
 
 ### Design the Database Before Business Modules
 
@@ -1348,7 +1913,7 @@ New-Item -ItemType Directory -Force $folder | Out-Null
 ### Dependency Flow, the flow is
 
 ```
-    Request
+    HTTP Request
       ↓
     presentation/
       ↓
@@ -1361,64 +1926,26 @@ New-Item -ItemType Directory -Force $folder | Out-Null
     Database / External Services
 ```
 
-### Dependency direction
+### And the response travels back:
 
 ```
-presentation ──────→ application ──────→ domain
-      │                    │
-      │                    ↓
-      └──────────────→ infrastructure
+DATABASE
+   │
+   ▼
+INFRASTRUCTURE
+   │
+   ▼
+APPLICATION
+   │
+   ▼
+PRESENTATION
+   │
+   ▼
+HTTP RESPONSE
 ```
 
-- Instead of domain knows Prisma directly , Infrastructure must implements domain contracts
-
-```
-  Infrastructure
-  ↓
-  implements
-  ↓
-  Domain interfaces
-```
-
-### 10.1.2 Clean Architecture Layers
-
-The backend follows **strict Clean Architecture** with dependency inversion. Dependencies only flow inward.
-
-```
-┌──────────────────────────────────────────────────────────┐
-│ PRESENTATION LAYER │
-│ Controllers, Modules, Guards, Decorators │
-│ (NestJS-specific — HTTP request/response handling) │
-│ • Receives HTTP requests │
-│ • Validates input via ZodValidationPipe │
-│ • Calls use cases │
-│ • Returns response (auto-wrapped by TransformInterceptor)│
-├──────────────────────────────────────────────────────────┤
-│ APPLICATION LAYER │
-│ Use Cases (Injectable classes) + DTOs (Zod schemas) │
-│ • Each use case = one business operation │
-│ • Orchestrates: repo calls, audit logging, error throws │
-│ • Depends on domain interfaces, NOT implementations │
-├──────────────────────────────────────────────────────────┤
-│ DOMAIN LAYER (innermost — zero framework dependencies) │
-│ Entity interfaces, Repository interfaces, Domain Services│
-│ • Pure TypeScript — no NestJS, no Prisma imports │
-│ • Defines WHAT operations exist, not HOW they work │
-│ • Domain services contain pure business rules │
-├──────────────────────────────────────────────────────────┤
-│ INFRASTRUCTURE LAYER │
-│ Prisma repository implementations + ORM mappers │
-│ • Implements repository interfaces from domain layer │
-│ • Talks to PostgreSQL via PrismaService │
-│ • Handles soft-delete filtering, audit fields │
-├──────────────────────────────────────────────────────────┤
-│ SHARED LAYER (cross-cutting) │
-│ Constants, DTOs, Filters, Interceptors, Pipes, Utils │
-│ • Used by any layer │
-│ • Contains framework-specific utilities │
-└──────────────────────────────────────────────────────────┘
-```
-
+ 
+ 
 #### Dependency Inversion in Practice
 
 Instead of use cases depending on Prisma repositories directly, we use **Symbol-based injection tokens**:
@@ -2514,7 +3041,6 @@ frontend/src/
 ```
   npm install next-auth
 ```
-
 
 ### 15.4 Clean Architecture Layers
 
