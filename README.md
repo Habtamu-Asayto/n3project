@@ -357,11 +357,12 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
   git add .
   git commit -m "chore: initialize project"
 
+*************************************************************************************************
 ## 8. Backend Initialization
 
 ### Part 1
 
-### 8.1 build NestJS
+### build NestJS
 
     backend/
 
@@ -481,9 +482,7 @@ npm install @nestjs/config
 ```
 
 ### Load environment variables
-
 - Load .env environments by updating app.module.ts into:
-
 ```
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -501,7 +500,6 @@ export class AppModule {}
 - Now other modules can inject ConfigService without importing ConfigModule repeatedly. use is on main.ts
 
 ### Use ConfigService in main.ts
-
 ```
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
@@ -521,7 +519,6 @@ bootstrap();
 ```
 
 ## Add an API prefix
-
 - It must be versioned API endpoints such as Like-/api/v1/regions
 
 - Add to main.ts:
@@ -531,18 +528,15 @@ app.setGlobalPrefix(
   configService.get<string>('API_PREFIX', 'api/v1'),
 );
 ```
-
 - Now our route(@Get()) becomes : GET /api/v1/... instead of GET /
 
 ## Add global validation
-
 - Use class-validator, class-transformer and ValidationPipe for global validation. must be compatible version with nestjs and others....
-
+``` 
+npm install class-validator class-transformer 
 ```
-npm install class-validator class-transformer
-```
 
-### Update src/main.ts by adding ValidationPipe
+### Update src/main.ts by adding ValidationPipe 
 
 ```
 import { ValidationPipe } from '@nestjs/common';
@@ -555,11 +549,10 @@ app.useGlobalPipes(
 );
 ```
 
-## Test the backend run's
-
+## Test the backend run's 
 npm run start
 
-- Must get: 404, because haven't controller
+- Must get: 404, because haven't controller 
 
 ### Part 2
 
@@ -579,9 +572,8 @@ export class HealthController {
     };
   }
 }
-```
-
-- Then register it on app.module.ts:
+``` 
+- Then register it on app.module.ts: 
 
 ```
 import { Module } from '@nestjs/common';
@@ -632,9 +624,9 @@ export class AppModule {}
 }
 ```
 
-### Add Swagger
+### Add Swagger 
 
-- install it
+- install it 
 
 ```
 npm install @nestjs/swagger
@@ -668,13 +660,11 @@ SwaggerModule.setup('api/docs', app, document);
 
 ### Check docker existed
 
-```
-docker --version
-docker compose version
-```
-
+  ```
+  docker --version
+  docker compose version
+  ```
 ### Create docker-compose.yml
-
 - Create it on root folder, and add :
 
 ```
@@ -699,7 +689,6 @@ volumes:
   postgres_data:
 
 ```
-
 - Start PostgreSQL on the folder that docker-compose.yml exists
 
 ```
@@ -712,19 +701,19 @@ docker compose up -d
 ```
  docker ps
 
-```
+ ```
 
-- Verify PostgreSQL and can inspect the logs:
+ - Verify PostgreSQL and can inspect the logs:
 
-```
-docker logs n2p-learning
-```
+ ```
+ docker logs n2p-learning
+ ```
 
 ### Introduce & Prisma Setup
 
 - Prisma is an ORM/toolkit for working with databases from application code.
 
-- Instead of manually writing SQL(SELECT \* FROM users WHERE id = 1;) everywhere, we can eventually write TypeScript like:
+- Instead of manually writing SQL(SELECT * FROM users WHERE id = 1;) everywhere, we can eventually write TypeScript like:
 
 ```
 prisma.user.findUnique({
@@ -762,25 +751,24 @@ npx prisma init
     └── package.json
 
 - .env should contain:
-  DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n2p_db?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/n2p_db?schema=public"
 
-- on prisma.config.ts
+-  on prisma.config.ts
 
-```
-  import "dotenv/config";
-  import { defineConfig } from "prisma/config";
+  ```
+    import "dotenv/config";
+    import { defineConfig } from "prisma/config";
 
-  export default defineConfig({
-    schema: "prisma/schema.prisma",
-    migrations: {
-      path: "prisma/migrations",
-    },
-    datasource: {
-      url: process.env.DATABASE_URL!,
-    },
-  });
-```
-
+    export default defineConfig({
+      schema: "prisma/schema.prisma",
+      migrations: {
+        path: "prisma/migrations",
+      },
+      datasource: {
+        url: process.env.DATABASE_URL!,
+      },
+    });
+  ```
 - Now Prisma can connect to PostgreSQL.
 
 ### Manage Prisma schema
@@ -806,7 +794,7 @@ datasource db {
 
 ```
 
-- Move to migration
+- Move to migration 
 
 ```
 npx prisma migrate dev --name init
@@ -839,7 +827,6 @@ docker exec -it n2p-learning psql -U postgres -d n2p_db
 ```
 
 ## 4. Clean Architecture Foundation
-
 -This clean architecture used to - Business rules should not depend on external technologies. it makes below
 
 ```
@@ -870,6 +857,7 @@ src/
 ├── infrastructure/
 └── presentation/
 ```
+ 
 
 ### Clean Architecture Layers
 
@@ -927,7 +915,7 @@ Domain -> Application -> Infrastructure
 
 ### Second: Application
 
-- Now create:
+- Now create: 
 
 ```
 backend/src/application/
@@ -937,7 +925,7 @@ backend/src/application/
 
 ### Third: Infrastructure
 
-- Create:
+- Create: 
 
 ```
 backend/src/infrastructure/
@@ -949,7 +937,7 @@ backend/src/infrastructure/
 
 ### Fourth: Presentation
 
-- Create :
+- Create : 
 
 ```
     backend/src/presentation/`
@@ -998,7 +986,6 @@ backend/src/infrastructure/
 ```
 
 ## Build the Region Backend
-
 - complete flow becomes
 
 ```
@@ -1021,13 +1008,11 @@ PostgreSQL
 ```
 
 - Lets start with:
-
 ```
 POST /api/v1/regions
 ```
 
 ### First create the Region database model
-
 - Open: backend/prisma/schema.prisma, and add:
 
 ```bash
@@ -1054,8 +1039,9 @@ Use UUID instead of integer making harder to guess and work well in distributed 
 ```
 npx prisma migrate dev --name add_region
 ```
+ 
+ Then verify it in both ways.
 
-Then verify it in both ways.
 
 ### Now the interesting part: Domain
 
@@ -1065,6 +1051,7 @@ Then verify it in both ways.
 backend/src/domain/geography/entities/region.entity.ts    , Then add:
 
 ```
+
 
 ```typescript
 export interface RegionEntity {
@@ -1096,11 +1083,12 @@ Domain entities - represents the business concept.
 
 Instead of Domain-> Prima, we will continue Domain<- Infrastructure - prisma.
 Infrastructure translates between the database representation and the domain representation.
+ 
 
 ### Domain repository interface
 
-domain needs a way to store Regions. for that create the repository
-
+ domain needs a way to store Regions. for that create the repository
+ 
 - Create:
 
 ```
@@ -1109,14 +1097,14 @@ src/domain/geography/repositories/region.repository.ts    and add:
 ```
 
 ```typescript
-import { RegionEntity } from "../entities/region.entity";
+import { RegionEntity } from '../entities/region.entity';
 
 export interface IRegionRepository {
   findAll(query: {
     page: number;
     limit: number;
     sortBy: string;
-    sortOrder: "asc" | "desc";
+    sortOrder: 'asc' | 'desc';
     search?: string;
     isActive?: boolean;
   }): Promise<{
@@ -1128,7 +1116,10 @@ export interface IRegionRepository {
 
   findByCode(code: string): Promise<RegionEntity | null>;
 
-  create(data: Partial<RegionEntity>, userId?: string): Promise<RegionEntity>;
+  create(
+    data: Partial<RegionEntity>,
+    userId?: string,
+  ): Promise<RegionEntity>;
 
   update(
     id: string,
@@ -1138,13 +1129,17 @@ export interface IRegionRepository {
 
   softDelete(id: string, userId?: string): Promise<void>;
 
-  lookup(): Promise<Pick<RegionEntity, "id" | "name" | "code">[]>;
+  lookup(): Promise<
+    Pick<RegionEntity, 'id' | 'name' | 'code'>[]
+  >;
 }
+
 ```
 
 There is no Prisma(either PrismaClient or PrismaService) existed till now. It is Just only pure business-facing contract.
 
 It does not say how, instead All needs somebody.
+
 
 ### PrismaService
 
@@ -1164,11 +1159,11 @@ import {
   Logger,
   OnModuleDestroy,
   OnModuleInit,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PrismaClient } from "../../../generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import pg from "pg";
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PrismaClient } from '../../../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
 @Injectable()
 export class PrismaService
@@ -1179,10 +1174,11 @@ export class PrismaService
   private readonly pool: pg.Pool;
 
   constructor(private readonly configService: ConfigService) {
-    const connectionString = configService.get<string>("DATABASE_URL");
+    const connectionString =
+      configService.get<string>('DATABASE_URL');
 
     if (!connectionString) {
-      throw new Error("DATABASE_URL is not configured");
+      throw new Error('DATABASE_URL is not configured');
     }
 
     const pool = new pg.Pool({
@@ -1198,13 +1194,13 @@ export class PrismaService
 
   async onModuleInit(): Promise<void> {
     await this.$connect();
-    this.logger.log("Database connection established");
+    this.logger.log('Database connection established');
   }
 
   async onModuleDestroy(): Promise<void> {
     await this.$disconnect();
     await this.pool.end();
-    this.logger.log("Database connection closed");
+    this.logger.log('Database connection closed');
   }
 
   softDeleteFilter() {
@@ -1236,21 +1232,22 @@ export class PrismaService
 
 - Who will provide the implementation?
 
-  ### It is infrastructure,
-
+  ### It is infrastructure, 
+  
   it will implement RegionRepository
 
   ```
-  src/infrastructure/geography/database/repositories/region.repository.impl.ts
-
+  src/infrastructure/geography/database/repositories/region.repository.impl.ts 
+  
   ```
 
 ```typescript
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../database/prisma/prisma.service";
-import { IRegionRepository } from "../../../../domain/geography/repositories/region.repository";
-import { RegionEntity } from "../../../../domain/geography/entities/region.entity";
-import { PaginationUtil } from "../../../../shared/utils";
+
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../database/prisma/prisma.service';
+import { IRegionRepository } from '../../../../domain/geography/repositories/region.repository';
+import { RegionEntity } from '../../../../domain/geography/entities/region.entity';
+import { PaginationUtil } from '../../../../shared/utils';
 
 @Injectable()
 export class PrismaRegionRepository implements IRegionRepository {
@@ -1260,7 +1257,7 @@ export class PrismaRegionRepository implements IRegionRepository {
     page: number;
     limit: number;
     sortBy: string;
-    sortOrder: "asc" | "desc";
+    sortOrder: 'asc' | 'desc';
     search?: string;
     isActive?: boolean;
   }): Promise<{
@@ -1276,13 +1273,13 @@ export class PrismaRegionRepository implements IRegionRepository {
         {
           name: {
             contains: query.search,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
         {
           code: {
             contains: query.search,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
       ];
@@ -1338,20 +1335,20 @@ export class PrismaRegionRepository implements IRegionRepository {
   }
 
   async create(
-    data: Partial<RegionEntity>,
-    userId?: string,
-  ): Promise<RegionEntity> {
-    const region = await this.prisma.region.create({
-      data: {
-        name: data.name!,
-        code: data.code!,
-        isActive: data.isActive ?? true,
-        ...this.prisma.auditCreate(userId),
-      },
-    });
+  data: Partial<RegionEntity>,
+  userId?: string,
+): Promise<RegionEntity> {
+  const region = await this.prisma.region.create({
+    data: {
+      name: data.name!,
+      code: data.code!,
+      isActive: data.isActive ?? true,
+      ...this.prisma.auditCreate(userId),
+    },
+  });
 
-    return region as RegionEntity;
-  }
+  return region as RegionEntity;
+}
 
   async update(
     id: string,
@@ -1383,7 +1380,7 @@ export class PrismaRegionRepository implements IRegionRepository {
     });
   }
 
-  async lookup(): Promise<Pick<RegionEntity, "id" | "name" | "code">[]> {
+  async lookup(): Promise<Pick<RegionEntity, 'id' | 'name' | 'code'>[]> {
     return this.prisma.region.findMany({
       select: {
         id: true,
@@ -1391,11 +1388,12 @@ export class PrismaRegionRepository implements IRegionRepository {
         code: true,
       },
       orderBy: {
-        name: "asc",
+        name: 'asc',
       },
     });
   }
 }
+
 ```
 
 ### Now Application
@@ -1407,8 +1405,8 @@ src/application/geography/use-cases/region.usecases.ts    The add:
 ```
 
 ```typescript
-import { RegionEntity } from "../../../domain/geography/entities/region.entity";
-import { IRegionRepository } from "../../../domain/geography/repositories/region.repository";
+import { RegionEntity } from '../../../domain/geography/entities/region.entity';
+import { IRegionRepository } from '../../../domain/geography/repositories/region.repository';
 
 export interface CreateRegionInput {
   name: string;
@@ -1426,22 +1424,25 @@ export interface FindRegionsInput {
   page: number;
   limit: number;
   sortBy: string;
-  sortOrder: "asc" | "desc";
+  sortOrder: 'asc' | 'desc';
   search?: string;
   isActive?: boolean;
 }
 
 export class RegionUseCases {
-  constructor(private readonly regionRepository: IRegionRepository) {}
+  constructor(
+    private readonly regionRepository: IRegionRepository,
+  ) {}
 
   async create(
     data: CreateRegionInput,
     userId?: string,
   ): Promise<RegionEntity> {
-    const existingRegion = await this.regionRepository.findByCode(data.code);
+    const existingRegion =
+      await this.regionRepository.findByCode(data.code);
 
     if (existingRegion) {
-      throw new Error("Region code already exists");
+      throw new Error('Region code already exists');
     }
 
     return this.regionRepository.create(data, userId);
@@ -1461,27 +1462,39 @@ export class RegionUseCases {
     userId?: string,
   ): Promise<RegionEntity> {
     if (data.code) {
-      const existingRegion = await this.regionRepository.findByCode(data.code);
+      const existingRegion =
+        await this.regionRepository.findByCode(data.code);
 
       if (existingRegion && existingRegion.id !== id) {
-        throw new Error("Region code already exists");
+        throw new Error('Region code already exists');
       }
     }
 
-    return this.regionRepository.update(id, data, userId);
+    return this.regionRepository.update(
+      id,
+      data,
+      userId,
+    );
   }
 
-  async softDelete(id: string, userId?: string): Promise<void> {
-    return this.regionRepository.softDelete(id, userId);
+  async softDelete(
+    id: string,
+    userId?: string,
+  ): Promise<void> {
+    return this.regionRepository.softDelete(
+      id,
+      userId,
+    );
   }
 
   async lookup() {
     return this.regionRepository.lookup();
   }
 }
+
 ```
 
-### Create the Geography module
+### Create the Geography module 
 
 - Create:
 
@@ -1490,13 +1503,14 @@ backend/src/presentation/geography/geography.module.ts
 ```
 
 ```typescript
-import { Module } from "@nestjs/common";
-import { RegionUseCases } from "../../application/geography/use-cases/region.usecases";
-import { IRegionRepository } from "../../domain/geography/repositories/region.repository";
-import { PrismaRegionRepository } from "../../infrastructure/geography/database/repositories/region.repository.impl";
-import { PrismaService } from "../../infrastructure/database/prisma/prisma.service";
 
-export const REGION_REPOSITORY = Symbol("REGION_REPOSITORY");
+import { Module } from '@nestjs/common';
+import { RegionUseCases } from '../../application/geography/use-cases/region.usecases';
+import { IRegionRepository } from '../../domain/geography/repositories/region.repository';
+import { PrismaRegionRepository } from '../../infrastructure/geography/database/repositories/region.repository.impl';
+import { PrismaService } from '../../infrastructure/database/prisma/prisma.service';
+
+export const REGION_REPOSITORY = Symbol('REGION_REPOSITORY');
 
 @Module({
   providers: [
@@ -1529,9 +1543,10 @@ backend/src/app.module.ts  Then Add:
 ```
 
 ```typescript
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { GeographyModule } from "./presentation/geography/geography.module";
+
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GeographyModule } from './presentation/geography/geography.module';
 
 @Module({
   imports: [
@@ -1542,10 +1557,10 @@ import { GeographyModule } from "./presentation/geography/geography.module";
   ],
 })
 export class AppModule {}
+
 ```
 
 ### Verify compilation
-
 npm run build
 npm run start:dev
 
@@ -1565,8 +1580,9 @@ backend/src/shared/dto/index.ts
 ```
 
 ```typescript
-export * from "./pagination.dto";
-export * from "./api-response.dto";
+export * from './pagination.dto';
+export * from './api-response.dto';
+
 ```
 
 ```
@@ -1586,7 +1602,10 @@ export class ApiResponseDto<T = any> {
     this.timestamp = new Date().toISOString();
   }
 
-  static success<T>(data: T, message = "Success"): ApiResponseDto<T> {
+  static success<T>(
+    data: T,
+    message = 'Success',
+  ): ApiResponseDto<T> {
     return new ApiResponseDto({
       success: true,
       message,
@@ -1594,7 +1613,10 @@ export class ApiResponseDto<T = any> {
     });
   }
 
-  static error(message: string, errors?: any): ApiResponseDto {
+  static error(
+    message: string,
+    errors?: any,
+  ): ApiResponseDto {
     return new ApiResponseDto({
       success: false,
       message,
@@ -1609,9 +1631,11 @@ export class ApiResponseDto<T = any> {
       limit: number;
       total: number;
     },
-    message = "Success",
+    message = 'Success',
   ) {
-    const totalPages = Math.ceil(meta.total / meta.limit);
+    const totalPages = Math.ceil(
+      meta.total / meta.limit,
+    );
 
     return new ApiResponseDto({
       success: true,
@@ -1637,20 +1661,20 @@ backend/src/shared/dto/pagination.dto.ts
 ```
 
 ```typescript
-import { z } from "zod";
+import { z } from 'zod';
 
 export const PaginationQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
-  sortBy: z.string().optional().default("createdAt"),
-  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+  sortBy: z.string().optional().default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   search: z.string().optional(),
 });
 
 export type PaginationQueryDto = z.infer<typeof PaginationQuerySchema>;
 ```
-
-- Create
+ 
+- Create 
 
 ```
 
@@ -1659,14 +1683,15 @@ backend/src/application/geography/dto/geography.dto.ts
 ```
 
 ```typescript
-import { z } from "zod";
-import { PaginationQuerySchema } from "../../../shared/dto";
+
+import { z } from 'zod';
+import { PaginationQuerySchema } from '../../../shared/dto';
 
 // ── Geography DTOs ───────────────────────────────────────────────────────────
 
 export const CreateRegionSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200),
-  code: z.string().min(1, "Code is required").max(20),
+  name: z.string().min(1, 'Name is required').max(200),
+  code: z.string().min(1, 'Code is required').max(20),
   isActive: z.boolean().optional().default(true),
 });
 
@@ -1676,18 +1701,26 @@ export const UpdateRegionSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const GeographyQuerySchema = PaginationQuerySchema.extend({
-  isActive: z.coerce.boolean().optional(),
-  regionId: z.string().uuid().optional(),
-  zoneId: z.string().uuid().optional(),
-  woredaId: z.string().uuid().optional(),
-});
+export const GeographyQuerySchema =
+  PaginationQuerySchema.extend({
+    isActive: z.coerce.boolean().optional(),
+    regionId: z.string().uuid().optional(),
+    zoneId: z.string().uuid().optional(),
+    woredaId: z.string().uuid().optional(),
+  });
 
-export type CreateRegionDto = z.infer<typeof CreateRegionSchema>;
+export type CreateRegionDto = z.infer<
+  typeof CreateRegionSchema
+>;
 
-export type UpdateRegionDto = z.infer<typeof UpdateRegionSchema>;
+export type UpdateRegionDto = z.infer<
+  typeof UpdateRegionSchema
+>;
 
-export type GeographyQueryDto = z.infer<typeof GeographyQuerySchema>;
+export type GeographyQueryDto = z.infer<
+  typeof GeographyQuerySchema
+>;
+
 ```
 
 ### Build Check
@@ -1701,11 +1734,14 @@ npm run build
 ```
 backend/src/shared/pipes/zod-validation.pipe.ts  Then add:
 ```
-
 ```typescript
-import { PipeTransform, Injectable, BadRequestException } from "@nestjs/common";
+import {
+  PipeTransform,
+  Injectable,
+  BadRequestException,
+} from '@nestjs/common';
 
-import { ZodSchema, ZodError } from "zod";
+import { ZodSchema, ZodError } from 'zod';
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
@@ -1721,20 +1757,21 @@ export class ZodValidationPipe implements PipeTransform {
     } catch (error) {
       if (error instanceof ZodError) {
         const formattedErrors = error.issues.map((issue) => ({
-          field: issue.path.join("."),
+          field: issue.path.join('.'),
           message: issue.message,
         }));
 
         throw new BadRequestException({
-          message: "Validation failed",
+          message: 'Validation failed',
           errors: formattedErrors,
         });
       }
 
-      throw new BadRequestException("Validation failed");
+      throw new BadRequestException('Validation failed');
     }
   }
 }
+
 ```
 
 ### Create Region DTO + Zod Validation
@@ -1746,23 +1783,36 @@ src/presentation/geography/controllers/region.controller.ts
 ```
 
 ```typescript
-import { Body, Controller, Post } from "@nestjs/common";
 
-import { CreateRegionSchema } from "../../../application/geography/dto/geography.dto";
+import {
+  Body,
+  Controller,
+  Post,
+} from '@nestjs/common';
 
-import type { CreateRegionDto } from "../../../application/geography/dto/geography.dto";
+import {
+  CreateRegionSchema,
+} from '../../../application/geography/dto/geography.dto';
 
-import { RegionUseCases } from "../../../application/geography/use-cases/region.usecases";
+import type {
+  CreateRegionDto,
+} from '../../../application/geography/dto/geography.dto';
 
-import { ZodValidationPipe } from "../../../shared/pipes/zod-validation.pipe";
+import { RegionUseCases } from '../../../application/geography/use-cases/region.usecases';
 
-@Controller("regions")
+import { ZodValidationPipe } from '../../../shared/pipes/zod-validation.pipe';
+
+@Controller('regions')
 export class RegionController {
-  constructor(private readonly regionUseCases: RegionUseCases) {}
+  constructor(
+    private readonly regionUseCases: RegionUseCases,
+  ) {}
 
   @Post()
   async create(
-    @Body(new ZodValidationPipe(CreateRegionSchema))
+    @Body(
+      new ZodValidationPipe(CreateRegionSchema),
+    )
     dto: CreateRegionDto,
   ) {
     return this.regionUseCases.create({
@@ -1772,24 +1822,28 @@ export class RegionController {
     });
   }
 }
+
 ```
 
 ### Geography module now
 
 ```typescript
-import { Module } from "@nestjs/common";
 
-import { RegionUseCases } from "../../application/geography/use-cases/region.usecases";
+import { Module } from '@nestjs/common';
 
-import { IRegionRepository } from "../../domain/geography/repositories/region.repository";
+import { RegionUseCases } from '../../application/geography/use-cases/region.usecases';
 
-import { PrismaRegionRepository } from "../../infrastructure/geography/database/repositories/region.repository.impl";
+import { IRegionRepository } from '../../domain/geography/repositories/region.repository';
 
-import { PrismaService } from "../../infrastructure/database/prisma/prisma.service";
+import { PrismaRegionRepository } from '../../infrastructure/geography/database/repositories/region.repository.impl';
 
-import { RegionController } from "./controllers/region.controller";
+import { PrismaService } from '../../infrastructure/database/prisma/prisma.service';
 
-export const REGION_REPOSITORY = Symbol("REGION_REPOSITORY");
+import { RegionController } from './controllers/region.controller';
+
+export const REGION_REPOSITORY = Symbol(
+  'REGION_REPOSITORY',
+);
 
 @Module({
   controllers: [RegionController],
@@ -1804,7 +1858,9 @@ export const REGION_REPOSITORY = Symbol("REGION_REPOSITORY");
 
     {
       provide: RegionUseCases,
-      useFactory: (regionRepository: IRegionRepository) => {
+      useFactory: (
+        regionRepository: IRegionRepository,
+      ) => {
         return new RegionUseCases(regionRepository);
       },
       inject: [REGION_REPOSITORY],
@@ -1814,27 +1870,38 @@ export const REGION_REPOSITORY = Symbol("REGION_REPOSITORY");
   exports: [RegionUseCases],
 })
 export class GeographyModule {}
+
 ```
 
 ### Test it
-
 npm run build
 npm run start
 
 ### Update region.usecases.ts on application controller
 
 ```typescript
-import { Injectable, Inject, NotFoundException } from "@nestjs/common";
 
-import { IRegionRepository } from "../../../domain/geography/repositories/region.repository";
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+} from '@nestjs/common';
 
-import { RegionMapper } from "../../../infrastructure/geography/database/entities";
+import { IRegionRepository } from '../../../domain/geography/repositories/region.repository';
 
-import { PaginationUtil } from "../../../shared/utils";
+import { RegionMapper } from '../../../infrastructure/geography/database/entities';
 
-import { CreateRegionDto, UpdateRegionDto, GeographyQueryDto } from "../dto";
+import { PaginationUtil } from '../../../shared/utils';
 
-export const REGION_REPOSITORY = Symbol("REGION_REPOSITORY");
+import {
+  CreateRegionDto,
+  UpdateRegionDto,
+  GeographyQueryDto,
+} from '../dto';
+
+export const REGION_REPOSITORY = Symbol(
+  'REGION_REPOSITORY',
+);
 
 @Injectable()
 export class GetRegionsUseCase {
@@ -1844,11 +1911,16 @@ export class GetRegionsUseCase {
   ) {}
 
   async execute(query: GeographyQueryDto) {
-    const { items, total } = await this.regionRepo.findAll(query);
+    const { items, total } =
+      await this.regionRepo.findAll(query);
 
     return {
       items: RegionMapper.toResponseDtoList(items),
-      meta: PaginationUtil.buildMeta(query.page, query.limit, total),
+      meta: PaginationUtil.buildMeta(
+        query.page,
+        query.limit,
+        total,
+      ),
     };
   }
 }
@@ -1861,10 +1933,13 @@ export class GetRegionUseCase {
   ) {}
 
   async execute(id: string) {
-    const region = await this.regionRepo.findById(id);
+    const region =
+      await this.regionRepo.findById(id);
 
     if (!region) {
-      throw new NotFoundException("Region not found");
+      throw new NotFoundException(
+        'Region not found',
+      );
     }
 
     return RegionMapper.toResponseDto(region);
@@ -1878,14 +1953,24 @@ export class CreateRegionUseCase {
     private readonly regionRepo: IRegionRepository,
   ) {}
 
-  async execute(dto: CreateRegionDto, userId?: string) {
-    const existing = await this.regionRepo.findByCode(dto.code);
+  async execute(
+    dto: CreateRegionDto,
+    userId?: string,
+  ) {
+    const existing =
+      await this.regionRepo.findByCode(dto.code);
 
     if (existing) {
-      throw new Error("Region code already exists");
+      throw new Error(
+        'Region code already exists',
+      );
     }
 
-    const region = await this.regionRepo.create(dto, userId);
+    const region =
+      await this.regionRepo.create(
+        dto,
+        userId,
+      );
 
     return RegionMapper.toResponseDto(region);
   }
@@ -1898,22 +1983,42 @@ export class UpdateRegionUseCase {
     private readonly regionRepo: IRegionRepository,
   ) {}
 
-  async execute(id: string, dto: UpdateRegionDto, userId?: string) {
-    const existing = await this.regionRepo.findById(id);
+  async execute(
+    id: string,
+    dto: UpdateRegionDto,
+    userId?: string,
+  ) {
+    const existing =
+      await this.regionRepo.findById(id);
 
     if (!existing) {
-      throw new NotFoundException("Region not found");
+      throw new NotFoundException(
+        'Region not found',
+      );
     }
 
     if (dto.code) {
-      const duplicate = await this.regionRepo.findByCode(dto.code);
+      const duplicate =
+        await this.regionRepo.findByCode(
+          dto.code,
+        );
 
-      if (duplicate && duplicate.id !== id) {
-        throw new Error("Region code already exists");
+      if (
+        duplicate &&
+        duplicate.id !== id
+      ) {
+        throw new Error(
+          'Region code already exists',
+        );
       }
     }
 
-    const region = await this.regionRepo.update(id, dto, userId);
+    const region =
+      await this.regionRepo.update(
+        id,
+        dto,
+        userId,
+      );
 
     return RegionMapper.toResponseDto(region);
   }
@@ -1926,14 +2031,23 @@ export class DeleteRegionUseCase {
     private readonly regionRepo: IRegionRepository,
   ) {}
 
-  async execute(id: string, userId?: string) {
-    const existing = await this.regionRepo.findById(id);
+  async execute(
+    id: string,
+    userId?: string,
+  ) {
+    const existing =
+      await this.regionRepo.findById(id);
 
     if (!existing) {
-      throw new NotFoundException("Region not found");
+      throw new NotFoundException(
+        'Region not found',
+      );
     }
 
-    await this.regionRepo.softDelete(id, userId);
+    await this.regionRepo.softDelete(
+      id,
+      userId,
+    );
   }
 }
 
@@ -1961,6 +2075,7 @@ backend/src/infrastructure/geography/database/entities/region.orm-entity.ts  And
 ```
 
 ```typescript
+
 export class RegionMapper {
   static toResponseDto(region: any) {
     return {
@@ -1974,9 +2089,12 @@ export class RegionMapper {
   }
 
   static toResponseDtoList(regions: any[]) {
-    return regions.map((r) => RegionMapper.toResponseDto(r));
+    return regions.map((r) =>
+      RegionMapper.toResponseDto(r),
+    );
   }
 }
+
 ```
 
 ```
@@ -1985,7 +2103,7 @@ entities/index.ts
 ```
 
 ```typescript
-export { RegionMapper } from "./region.orm-entity";
+export { RegionMapper } from './region.orm-entity';
 ```
 
 ```
@@ -1994,7 +2112,7 @@ database/repositories/index.ts
 ```
 
 ```typescript
-export { PrismaRegionRepository } from "./region.repository.impl";
+export { PrismaRegionRepository } from './region.repository.impl';
 ```
 
 ```
@@ -2002,9 +2120,10 @@ database/index.ts
 ```
 
 ```typescript
-export * from "./entities";
-export * from "./repositories";
+export * from './entities';
+export * from './repositories';
 ```
+
 
 ### move to Region Use Cases and update it:
 
@@ -2015,17 +2134,22 @@ backend/src/application/geography/use-cases/region.usecases.ts
 ```
 
 ```typescript
-import { Injectable, Inject, NotFoundException } from "@nestjs/common";
 
-import { GEOGRAPHY_TOKENS } from "../../../shared/constants";
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 
-import { IRegionRepository } from "../../../domain/geography/repositories/region.repository";
+import { GEOGRAPHY_TOKENS } from '../../../shared/constants';
 
-import { RegionMapper } from "../../../infrastructure/geography/database/entities";
+import { IRegionRepository } from '../../../domain/geography/repositories/region.repository';
 
-import { PaginationUtil } from "../../../shared/utils";
+import { RegionMapper } from '../../../infrastructure/geography/database/entities';
 
-import { CreateRegionDto, UpdateRegionDto, GeographyQueryDto } from "../dto";
+import { PaginationUtil } from '../../../shared/utils';
+
+import {
+  CreateRegionDto,
+  UpdateRegionDto,
+  GeographyQueryDto,
+} from '../dto';
 
 @Injectable()
 export class GetRegionsUseCase {
@@ -2035,11 +2159,16 @@ export class GetRegionsUseCase {
   ) {}
 
   async execute(query: GeographyQueryDto) {
-    const { items, total } = await this.regionRepo.findAll(query);
+    const { items, total } =
+      await this.regionRepo.findAll(query);
 
     return {
       items: RegionMapper.toResponseDtoList(items),
-      meta: PaginationUtil.buildMeta(query.page, query.limit, total),
+      meta: PaginationUtil.buildMeta(
+        query.page,
+        query.limit,
+        total,
+      ),
     };
   }
 }
@@ -2055,7 +2184,7 @@ export class GetRegionUseCase {
     const region = await this.regionRepo.findById(id);
 
     if (!region) {
-      throw new NotFoundException("Region not found");
+      throw new NotFoundException('Region not found');
     }
 
     return RegionMapper.toResponseDto(region);
@@ -2070,10 +2199,12 @@ export class CreateRegionUseCase {
   ) {}
 
   async execute(dto: CreateRegionDto) {
-    const existing = await this.regionRepo.findByCode(dto.code);
+    const existing = await this.regionRepo.findByCode(
+      dto.code,
+    );
 
     if (existing) {
-      throw new Error("Region code already exists");
+      throw new Error('Region code already exists');
     }
 
     const region = await this.regionRepo.create(dto);
@@ -2089,22 +2220,31 @@ export class UpdateRegionUseCase {
     private readonly regionRepo: IRegionRepository,
   ) {}
 
-  async execute(id: string, dto: UpdateRegionDto) {
+  async execute(
+    id: string,
+    dto: UpdateRegionDto,
+  ) {
     const existing = await this.regionRepo.findById(id);
 
     if (!existing) {
-      throw new NotFoundException("Region not found");
+      throw new NotFoundException('Region not found');
     }
 
     if (dto.code && dto.code !== existing.code) {
-      const codeExists = await this.regionRepo.findByCode(dto.code);
+      const codeExists =
+        await this.regionRepo.findByCode(dto.code);
 
       if (codeExists) {
-        throw new Error("Region code already exists");
+        throw new Error(
+          'Region code already exists',
+        );
       }
     }
 
-    const region = await this.regionRepo.update(id, dto);
+    const region = await this.regionRepo.update(
+      id,
+      dto,
+    );
 
     return RegionMapper.toResponseDto(region);
   }
@@ -2121,7 +2261,7 @@ export class DeleteRegionUseCase {
     const existing = await this.regionRepo.findById(id);
 
     if (!existing) {
-      throw new NotFoundException("Region not found");
+      throw new NotFoundException('Region not found');
     }
 
     await this.regionRepo.softDelete(id);
@@ -2141,14 +2281,16 @@ export class LookupRegionsUseCase {
 }
 ```
 
-- Create index.ts on
+- Create index.ts on 
 
 ```
 application/geography/dto/index.ts and add:
 ```
 
 ```typescript
-export * from "./geography.dto";
+
+export * from './geography.dto'
+
 ```
 
 ### Create index.ts on
@@ -2159,8 +2301,10 @@ backend/src/application/geography/use-cases/index.ts   Then add:
 ```
 
 ```typescript
-export * from "./region.usecases";
+export * from './region.usecases'
+
 ```
+
 
 ### Update Region Module
 
@@ -2171,8 +2315,10 @@ backend/src/presentation/geography/geography.module.ts
 
 ```
 
+
 ```typescript
-import { Module } from "@nestjs/common";
+
+import { Module } from '@nestjs/common';
 
 import {
   GetRegionsUseCase,
@@ -2181,15 +2327,15 @@ import {
   UpdateRegionUseCase,
   DeleteRegionUseCase,
   LookupRegionsUseCase,
-} from "../../application/geography/use-cases";
+} from '../../application/geography/use-cases';
 
-import { PrismaService } from "../../infrastructure/database/prisma/prisma.service";
+import { PrismaService } from '../../infrastructure/database/prisma/prisma.service';
 
-import { PrismaRegionRepository } from "../../infrastructure/geography/database/repositories/region.repository.impl";
+import { PrismaRegionRepository } from '../../infrastructure/geography/database/repositories/region.repository.impl';
 
-import { RegionController } from "./controllers/region.controller";
+import { RegionController } from './controllers/region.controller';
 
-import { GEOGRAPHY_TOKENS } from "../../shared/constants";
+import { GEOGRAPHY_TOKENS } from '../../shared/constants';
 
 @Module({
   controllers: [RegionController],
@@ -2220,6 +2366,7 @@ import { GEOGRAPHY_TOKENS } from "../../shared/constants";
   ],
 })
 export class GeographyModule {}
+
 ```
 
 ### update region controller also
@@ -2238,19 +2385,19 @@ import {
   Param,
   Query,
   Body,
-} from "@nestjs/common";
+} from '@nestjs/common';
 
 import {
   GeographyQuerySchema,
   CreateRegionSchema,
   UpdateRegionSchema,
-} from "../../../application/geography/dto";
+} from '../../../application/geography/dto';
 
 import type {
   GeographyQueryDto,
   CreateRegionDto,
   UpdateRegionDto,
-} from "../../../application/geography/dto";
+} from '../../../application/geography/dto';
 
 import {
   GetRegionsUseCase,
@@ -2259,11 +2406,11 @@ import {
   UpdateRegionUseCase,
   DeleteRegionUseCase,
   LookupRegionsUseCase,
-} from "../../../application/geography/use-cases";
+} from '../../../application/geography/use-cases';
 
-import { ZodValidationPipe } from "../../../shared/pipes/zod-validation.pipe";
+import { ZodValidationPipe } from '../../../shared/pipes/zod-validation.pipe';
 
-@Controller("regions")
+@Controller('regions')
 export class RegionController {
   constructor(
     private readonly getRegions: GetRegionsUseCase,
@@ -2276,51 +2423,58 @@ export class RegionController {
 
   @Get()
   findAll(
-    @Query(new ZodValidationPipe(GeographyQuerySchema))
+    @Query(
+      new ZodValidationPipe(GeographyQuerySchema),
+    )
     query: GeographyQueryDto,
   ) {
     return this.getRegions.execute(query);
   }
 
-  @Get("lookup")
+  @Get('lookup')
   lookup() {
     return this.lookupRegions.execute();
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
+  @Get(':id')
+  findOne(@Param('id') id: string) {
     return this.getRegion.execute(id);
   }
 
   @Post()
   create(
-    @Body(new ZodValidationPipe(CreateRegionSchema))
+    @Body(
+      new ZodValidationPipe(CreateRegionSchema),
+    )
     dto: CreateRegionDto,
   ) {
     return this.createRegion.execute(dto);
   }
 
-  @Put(":id")
+  @Put(':id')
   update(
-    @Param("id") id: string,
-    @Body(new ZodValidationPipe(UpdateRegionSchema))
+    @Param('id') id: string,
+    @Body(
+      new ZodValidationPipe(UpdateRegionSchema),
+    )
     dto: UpdateRegionDto,
   ) {
     return this.updateRegion.execute(id, dto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
+  @Delete(':id')
+  remove(@Param('id') id: string) {
     return this.deleteRegion.execute(id);
   }
 }
+
 ```
 
 ### Test the Complete Region API End-to-End
 
 - Test the below six operations
 
-Client -> Controller -> Use Case -> IRegionRepository -> PrismaRegionRepository -> Prisma -> PostgreSQL
+Client -> Controller -> Use Case -> IRegionRepository -> PrismaRegionRepository -> Prisma ->  PostgreSQL
 
 #### Start PostgreSQL
 
@@ -2333,7 +2487,6 @@ docker ps
 docker exec -it n2p-learning psql -U postgres -d n2p_db
 
 #### Start the NestJS backend
-
 npm run start
 
 Test :
@@ -2341,7 +2494,7 @@ http://localhost:4000/api/docs , Then must saw that all six operations appear.
 
 Try it out on GET /api/v1/regions
 
-Expected out put
+Expected out put 
 
 ```bash
 
@@ -2359,8 +2512,7 @@ Expected out put
 
 ```
 
-#### To Test The port
-
+####  To Test The port
 - Add ApiBody on backend/src/presentation/geography/controllers/region.controller.ts and add below sample data before create function
 
 ```bash
@@ -2395,7 +2547,7 @@ Expected result will be
 
 ```bash
 
-
+	
 Response body
 Download
 {
@@ -2408,6 +2560,7 @@ Download
 }
 
 ```
+
 
 ### Verify the database
 
@@ -2434,7 +2587,6 @@ GET /api/v1/regions?search=Addis
 ```
 
 ### Test isActive Filter
-
 ```
 GET /api/v1/regions?isActive=true
 
@@ -2477,7 +2629,6 @@ export const GeographyQuerySchema = PaginationQuerySchema.extend({
 ```
 
 ### Test isActive Filter again
-
 ```
 GET /api/v1/regions?isActive=true
 ```
@@ -2540,10 +2691,9 @@ Then Test by updating on swagger PUT method
 
 ### Test Adding duplicate code
 
-Then it displays 500 error.
+Then it displays  500 error.
 
 - Fix it by updating
-
 ```
 backend/src/application/geography/use-cases/region.usecases.ts
 ```
@@ -2551,13 +2701,12 @@ backend/src/application/geography/use-cases/region.usecases.ts
 - Change the import
 
 From:
-
 ```bash
 
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 ```
 
-- to:
+ - to:
 
 ```bash
 import {
@@ -2583,13 +2732,13 @@ Change to:
 if (existing) {
   throw new ConflictException('Region code already exists');
 }
-```
+``` 
 
 - Test is to recreate again.
 
 ### Test Validation
 
-Try creating a Region with an empty name: Just update on region.controller.ts
+Try creating a Region with an empty name: Just update on region.controller.ts 
 
 ```bash
 {
@@ -2605,23 +2754,21 @@ Then, Test on Swagger
 
 ```bash
 {
-  "name": "",
+  "name": "", 
   "isActive": true
 }
 ```
 
 ### Test Lookup
-
-```
+ ```
 GET /api/v1/regions/lookup
 ```
 
 ### Test Soft Delete
 
-### Test DELETE
+### Test DELETE 
 
-- First update
-
+- First update 
 ```
 backend/src/presentation/geography/controllers/region.controller.ts
 ```
@@ -2638,6 +2785,38 @@ import { ApiBody, ApiParam } from '@nestjs/swagger';
 })
 remove(@Param('id') id: string) {
   return this.deleteRegion.execute(id);
+}
+```
+
+#### We can Create folder structure based on the below code instead of creating manually step by step, run it on backend folder.
+
+```bash
+$folders = @(
+"src/domain",
+"src/application",
+"src/infrastructure",
+"src/presentation",
+"src/shared/constants",
+"src/shared/dto",
+"src/shared/enums",
+"src/shared/filters",
+"src/shared/interceptors",
+"src/shared/interfaces",
+"src/shared/pipes",
+"src/shared/utils"
+"src/domain/users/entities",
+"src/domain/users/repositories",
+"src/domain/users/services",
+"src/application/users/dto",
+"src/application/users/use-cases",
+"src/infrastructure/users/database/entities",
+"src/infrastructure/users/database/repositories",
+"src/presentation/users/controllers",
+"src/presentation/users/providers"
+)
+
+foreach ($folder in $folders) {
+New-Item -ItemType Directory -Force $folder | Out-Null
 }
 ```
 
@@ -2659,82 +2838,2402 @@ Prisma
 PostgreSQL
 ```
 
-#### Create folder structure based on the below code, run it on backend folder
+*************************************************************************************************
+ 
+## Initialize Frontend - Next.js
+
+### Create the Next.js project
 
 ```
-$folders = @(
-"src/domain",
-"src/application",
-"src/infrastructure",
-"src/presentation",
-"src/shared/constants",
-"src/shared/dto",
-"src/shared/enums",
-"src/shared/filters",
-"src/shared/interceptors",
-"src/shared/interfaces",
-"src/shared/pipes",
-"src/shared/utils"
-)
+npx create-next-app@latest frontend
+```
 
-foreach ($folder in $folders) {
-New-Item -ItemType Directory -Force $folder | Out-Null
+### Then Test it
+
+``` 
+npm run dev
+```
+
+### Install the frontend dependencies
+
+#### Remove the current dependencies and install  based on below package.json file
+
+##### First remove the current installation:
+
+```
+
+Remove-Item -Recurse -Force node_modules
+Remove-Item -Force package-lock.json
+
+```
+
+```typescript
+{
+  "name": "fms-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3016",
+    "build": "next build",
+    "start": "next start --port 3016",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.3.0",
+    "@tanstack/react-query": "^5.95.2",
+    "axios": "^1.13.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "formik": "^2.4.9",
+    "lucide-react": "^1.7.0",
+    "next": "16.2.1",
+    "next-auth": "^5.0.0-beta.30",
+    "next-intl": "^4.8.3",
+    "next-themes": "^0.4.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "shadcn": "^4.1.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+```
+
+##### Run and Test
+  
+  npm run dev
+
+## Create the FMS-style Region frontend structure
+
+- Create these folders:
+```
+New-Item -ItemType Directory -Force `
+src/domain/geography/entities, `
+src/infrastructure/geography/api, `
+src/presentation/components/geography/region, `
+src/presentation/hooks/geography, `
+src/shared/types
+```
+
+### each part will contain
+
+```
+domain/
+    Region types/models
+
+infrastructure/
+    API communication with NestJS
+
+presentation/
+    Region UI components + hooks
+
+app/
+    Actual Next.js routes/pages
+
+shared/
+    Reusable frontend types/utilities
+
+lib/
+    Frontend infrastructure/configuration
+```
+
+## Create the Region domain entity/type
+
+- Create:
+
+```
+frontend/src/domain/geography/entities/index.ts and Add:
+
+```
+
+```bash
+export interface RegionResponse {
+  id: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateRegionRequest {
+  name: string;
+  code: string;
+  isActive?: boolean;
+}
+
+export interface UpdateRegionRequest {
+  name?: string;
+  code?: string;
+  isActive?: boolean;
 }
 ```
 
-#### and for modules
+
+### Geography domain index
+
+- Create:
 
 ```
-$folders = @(
-"src/domain/users/entities",
-"src/domain/users/repositories",
-"src/domain/users/services",
-"src/application/users/dto",
-"src/application/users/use-cases",
-"src/infrastructure/users/database/entities",
-"src/infrastructure/users/database/repositories",
-"src/presentation/users/controllers",
-"src/presentation/users/providers"
-)
+frontend/src/domain/geography/index.ts   Then add
+```
 
-foreach ($folder in $folders) {
-New-Item -ItemType Directory -Force $folder | Out-Null
+``` bash
+export * from "./entities";
+```
+
+### Why are dates string?
+
+The backend sends JSON:
+
+```bash
+{
+  "createdAt": "2026-09-02T21:32:06.972Z",
+  "updatedAt": "2026-09-02T21:32:06.972Z"
 }
 ```
 
-### Dependency Flow, the flow is
+## Create the Region API response/query types
+
+### Add pagination types
+
+- Create:
 
 ```
-    HTTP Request
-      ↓
-    presentation/
-      ↓
-    application/
-      ↓
-    domain/
-      ↓
-    infrastructure/
-      ↓
-    Database / External Services
+frontend/src/domain/shared/entities/index.ts
 ```
 
-### And the response travels back:
+```bash
+
+o// ── API Response Wrappers ─────────────────────────────────────────────────────
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  timestamp: string;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: PaginationMeta;
+}
+
+export interface PaginationQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
 
 ```
-DATABASE
-   │
-   ▼
-INFRASTRUCTURE
-   │
-   ▼
-APPLICATION
-   │
-   ▼
-PRESENTATION
-   │
-   ▼
-HTTP RESPONSE
+
+#### frontend/src/domain/shared/index.ts
+
+```bash
+export * from "./entities";
 ```
+
+### Run and check
+
+npm run dev
+
+
+## Create Axios API client
+
+### Create the shared Axios client
+
+- create:
+
+```
+frontend/src/infrastructure/api/api-client.ts
+```
+
+```bash
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: '/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 30000,
+});
+
+export default api;
+```
+
+- create:
+
+```
+frontend/src/infrastructure/api/index.ts
+```
+
+```bash
+export { default as api } from "./api-client";
+```
+
+### update ON tconfig.json
+
+```bash
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+
+```
+### Create the Geography API
+
+```
+frontend/src/infrastructure/geography/api/geography.api.ts
+```
+
+```bash
+import api from "../../api/api-client";
+
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  PaginationQuery,
+} from "@/domain/shared/entities";
+
+import type {
+  RegionResponse,
+  CreateRegionRequest,
+  UpdateRegionRequest,
+} from "@/domain/geography/entities";
+export const regionsApi = {
+  // Boredem********
+  getAll: async (
+  params?: PaginationQuery & {
+    isActive?: boolean;
+  },
+ 
+): Promise<PaginatedResponse<RegionResponse>> => {
+  const { data } = await api.get<PaginatedResponse<RegionResponse>>(
+    "/regions",
+    {
+      params,
+    },
+  );
+
+  return data;
+},
+
+  getById: async (id: string) => {
+    const { data } = await api.get<ApiResponse<RegionResponse>>(
+      `/regions/${id}`,
+    );
+
+    return data;
+  },
+
+  create: async (payload: CreateRegionRequest) => {
+    const { data } = await api.post<ApiResponse<RegionResponse>>(
+      "/regions",
+      payload,
+    );
+
+    return data;
+  },
+
+  update: async (id: string, payload: UpdateRegionRequest) => {
+    const { data } = await api.put<ApiResponse<RegionResponse>>(
+      `/regions/${id}`,
+      payload,
+    );
+
+    return data;
+  },
+
+  delete: async (id: string) => {
+    const { data } = await api.delete<ApiResponse<null>>(`/regions/${id}`);
+
+    return data;
+  },
+
+  lookup: async () => {
+    const { data } =
+      await api.get<ApiResponse<RegionResponse[]>>("/regions/lookup");
+
+    return data.data ?? [];
+  },
+};
+
+```
+
+### Add the API URL
+
+- Create: frontend/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+
+- Restart Next.js after creating .env.local:
+
+    npm run dev
+
+## Create the Region React Query hooks
+
+- It used to: Component -> React Query Hook -> regionsApi -> Axios -> NestJS backend
+
+### Create the hooks file
+
+- Create:
+
+```
+frontend/src/presentation/hooks/geography/region.hooks.ts
+```
+
+```bash
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { regionsApi } from "@/infrastructure/geography/api/geography.api";
+
+import type {
+  CreateRegionRequest,
+  UpdateRegionRequest,
+} from "@/domain/geography/entities";
+
+import type { PaginationQuery } from "@/domain/shared/entities";
+
+const REGION_QUERY_KEY = ["regions"];
+
+type RegionQuery = PaginationQuery & {
+  isActive?: boolean;
+};
+
+export function useRegions(params?: RegionQuery) {
+  return useQuery({
+    queryKey: [...REGION_QUERY_KEY, params],
+    queryFn: () => regionsApi.getAll(params),
+  });
+}
+
+export function useRegion(id: string) {
+  return useQuery({
+    queryKey: [...REGION_QUERY_KEY, id],
+    queryFn: () => regionsApi.getById(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateRegion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateRegionRequest) => regionsApi.create(payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: REGION_QUERY_KEY,
+      });
+    },
+  });
+}
+
+export function useUpdateRegion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: UpdateRegionRequest;
+    }) => regionsApi.update(id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: REGION_QUERY_KEY,
+      });
+    },
+  });
+}
+
+export function useDeleteRegion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => regionsApi.delete(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: REGION_QUERY_KEY,
+      });
+    },
+  });
+}
+
+export function useRegionLookup() {
+  return useQuery({
+    queryKey: [...REGION_QUERY_KEY, "lookup"],
+    queryFn: () => regionsApi.lookup(),
+  });
+}
+
+
+```
+
+### Build 
+npm run build
+
+## React Query Provider
+
+### Create the provider
+
+- Create:
+```
+frontend/src/presentation/components/providers.tsx
+```
+- This may be the final one 
+
+```bash
+
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
+
+export function Providers({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 30 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+}
+```
+
+
+### move app to src and Add it(provider) to the root layout
+
+```
+frontend/src/app/layout.tsx
+```
+
+- Import
+
+```bash
+import { Providers } from '@/presentation/providers';
+```
+
+Then, wrap the application
+
+```bash
+<body>
+  <Providers>{children}</Providers>
+</body>
+
+```
+
+### Build
+npm run build
+
+
+## Create the Region page and display Regions
+
+- Lets create simple region page before creating reusable presentation components which are  crud-page.tsx, data-pagination.tsx, loading.tsx, and search-input.tsx.
+
+### Create the Region page
+
+- Create
+```
+frontend/src/app/geography/regions/page.tsx
+```
+
+```bash
+
+'use client';
+
+import { useRegions } from '@/presentation/hooks/geography/region.hooks';
+
+export default function RegionsPage() {
+  const { data, isLoading, isError } = useRegions({
+    page: 1,
+    limit: 10,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
+
+  if (isLoading) {
+    return <div className="p-6">Loading regions...</div>;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6 text-red-500">
+        Failed to load regions.
+      </div>
+    );
+  }
+
+  const regions = data?.items ?? [];
+
+  return (
+    <main className="p-6">
+      <h1 className="mb-6 text-2xl font-bold">Regions</h1>
+
+      {regions.length === 0 ? (
+        <p>No regions found.</p>
+      ) : (
+        <div className="space-y-3">
+          {regions.map((region) => (
+            <div
+              key={region.id}
+              className="rounded-lg border p-4"
+            >
+              <h2 className="font-semibold">{region.name}</h2>
+
+              <p className="text-sm text-gray-500">
+                Code: {region.code}
+              </p>
+
+              <p className="text-sm">
+                Status:{' '}
+                {region.isActive ? 'Active' : 'Inactive'}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
+
+```
+
+### Add enableCors() on backend/src/main.ts before listen  the app
+
+```bash
+app.enableCors({
+  origin: 'http://localhost:3016',
+  credentials: true,
+});
+```
+
+### Run both applications
+
+- Backend
+
+    npm run start:dev
+
+- Frontend
+
+    npm run dev
+
+
+## Make the region page with reusable CRUD architecture, which reusable components 
+
+### Create Reusable CRUD page
+
+- Create:
+```
+frontend/src/presentation/components/shared/crud-page.tsx
+```
+
+```bash
+'use client';
+
+import { ReactNode } from 'react';
+
+interface CrudPageProps {
+  title: string;
+  children: ReactNode;
+}
+
+export function CrudPage({
+  title,
+  children,
+}: CrudPageProps) {
+  return (
+    <main className="flex-1 p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{title}</h1>
+      </div>
+
+      {children}
+    </main>
+  );
+}
+
+```
+
+### Update the Region page using created CrudPage
+
+- Replace 
+```
+src/app/geography/regions/page.tsx
+```
+
+
+```bash
+'use client';
+
+import { CrudPage } from '@/presentation/components/shared/crud-page';
+import { useRegions } from '@/presentation/hooks/geography/region.hooks';
+
+export default function RegionsPage() {
+  const { data, isLoading, isError } = useRegions({
+    page: 1,
+    limit: 10,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
+
+  const regions = data?.items ?? [];
+
+  return (
+    <CrudPage title="Regions">
+      {isLoading && <p>Loading regions...</p>}
+
+      {isError && (
+        <p className="text-red-500">
+          Failed to load regions.
+        </p>
+      )}
+
+      {!isLoading && !isError && (
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b text-left">
+                <th className="p-4">Name</th>
+                <th className="p-4">Code</th>
+                <th className="p-4">Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {regions.map((region) => (
+                <tr key={region.id} className="border-b">
+                  <td className="p-4">{region.name}</td>
+                  <td className="p-4">{region.code}</td>
+                  <td className="p-4">
+                    {region.isActive ? 'Active' : 'Inactive'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </CrudPage>
+  );
+}
+```
+
+## shadcn/ui components
+### Install Button
+
+```
+npx shadcn@latest add button
+npx shadcn@latest add badge 
+................. we can also create others
+```
+
+Then it creates src/components/Button.tsx with src/lib/utils.ts, Then we put that utils.ts on
+
+```
+src/shared/utils/cn.ts and create src/shared/utils/index.ts 
+```
+  
+- Create
+
+```
+src/shared/utils/index.ts
+
+```
+
+```bash 
+export { cn } from "./cn";
+
+
+```
+
+And move src/components/Button.tsx to src/presentation/components/ui/Button.tsx.  It will be reusable component for ui components.
+
+## Create the reusable DataPagination component
+
+That pagination component will be used by CrudPage.
+
+### Create the file
+```
+frontend/src/presentation/components/shared/data-pagination.tsx
+```
+
+```bash
+
+'use client';
+
+import { Button } from '@/presentation/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/select';
+
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
+
+import type { PaginationMeta } from '@/domain/shared/entities';
+
+interface DataPaginationProps {
+  meta: PaginationMeta;
+  onPageChange: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
+}
+
+export function DataPagination({
+  meta,
+  onPageChange,
+  onLimitChange,
+}: DataPaginationProps) {
+  const {
+    page,
+    totalPages,
+    total,
+    limit,
+    hasNext,
+    hasPrevious,
+  } = meta;
+
+  return (
+    <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span>
+          {total} total record{total !== 1 ? 's' : ''}
+        </span>
+
+        {onLimitChange && (
+          <>
+            <span>·</span>
+
+            <Select
+              value={String(limit)}
+              onValueChange={(value) =>
+                onLimitChange(Number(value))
+              }
+            >
+              <SelectTrigger className="h-7 w-[70px]">
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                {[10, 20, 50, 100].map((size) => (
+                  <SelectItem
+                    key={size}
+                    value={String(size)}
+                  >
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <span>per page</span>
+          </>
+        )}
+      </div>
+
+      <div className="flex items-center gap-1">
+        <span className="mr-2 text-sm text-muted-foreground">
+          Page {page} of {totalPages}
+        </span>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={() => onPageChange(1)}
+          disabled={!hasPrevious}
+        >
+          <ChevronsLeft className="h-3.5 w-3.5" />
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={() => onPageChange(page - 1)}
+          disabled={!hasPrevious}
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={() => onPageChange(page + 1)}
+          disabled={!hasNext}
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={() => onPageChange(totalPages)}
+          disabled={!hasNext}
+        >
+          <ChevronsRight className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+```
+
+### Add PaginationMeta
+
+Our shared entities currently need the metadata type.
+
+- Update
+
+```
+src/domain/shared/entities/index.ts
+```
+
+It is already added before, Then On that file PaginatedResponse can use it(PaginationMeta)
+
+```bash
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: PaginationMeta;
+}
+
+
+```
+
+- Create
+```
+src/presentation/components/shared/index.ts Then add
+```
+
+```bash
+export * from './data-pagination';
+export * from './crud-page';
+```
+
+### data flow will eventually be:
+
+```
+CrudPage
+   ↓
+page / limit / search
+   ↓
+useQuery
+   ↓
+regionsApi
+   ↓
+Backend pagination
+   ↓
+PaginationMeta
+   ↓
+DataPagination
+```
+
+## Create the reusable SearchInput
+
+- Create 
+
+```
+frontend/src/presentation/components/shared/search-input.tsx
+```
+
+```bash
+
+"use client";
+
+import { useEffect, useState } from "react";
+import { Search, X } from "lucide-react";
+
+import { Input } from "@/presentation/components/ui/input";
+import { Button } from "@/presentation/components/ui/button";
+
+interface SearchInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  debounceMs?: number;
+  className?: string;
+}
+
+export function SearchInput({
+  value,
+  onChange,
+  placeholder = "Search...",
+  debounceMs = 300,
+  className,
+}: SearchInputProps) {
+  const [internal, setInternal] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (internal !== value) {
+        onChange(internal);
+      }
+    }, debounceMs);
+
+    return () => clearTimeout(timer);
+  }, [internal, value, debounceMs, onChange]);
+
+  return (
+    <div className={`relative ${className || ""}`}>
+      <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+      <Input
+        value={internal}
+        onChange={(e) => setInternal(e.target.value)}
+        placeholder={placeholder}
+        className="h-8 pl-8 pr-8 text-sm"
+      />
+
+       {internal && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-0 top-0 h-8 w-8"
+          onClick={() => {
+            setInternal("");
+            onChange("");
+          }}
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      )}
+    </div>
+  );
+}
+```
+
+### Export it
+
+- Update:
+
+```
+src/presentation/components/shared/index.ts    Add
+```
+
+```BASH 
+export * from './search-input';
+```
+
+## PageLoader + EmptyState
+
+- Create loading.tsx
+
+```
+
+frontend/src/presentation/components/shared/loading.tsx
+
+```
+
+```bash
+'use client';
+
+import { Loader2 } from 'lucide-react';
+
+export function PageLoader() {
+  return (
+    <div className="flex h-full min-h-[400px] items-center justify-center">
+      <Loader2 className="h-7 w-7 animate-spin text-primary" />
+    </div>
+  );
+}
+
+export function InlineLoader({
+  text = 'Loading...',
+}: {
+  text?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+      <span>{text}</span>
+    </div>
+  );
+}
+
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+}: {
+  icon?: React.ElementType;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-3 text-center">
+      {Icon && (
+        <Icon className="h-12 w-12 text-muted-foreground/30" />
+      )}
+
+      <div>
+        <h3 className="text-sm font-medium text-foreground">
+          {title}
+        </h3>
+
+        {description && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {description}
+          </p>
+        )}
+      </div>
+
+      {action}
+    </div>
+  );
+}
+
+```
+
+### Update index.ts and add
+
+```bash
+export * from './loading';
+```
+
+## ConfirmDialog
+
+  Create the reusable confirmation dialog that the FMS CrudPage uses before deleting a Region.
+
+- Create
+
+```
+src/presentation/components/shared/confirm-dialog.tsx
+
+```
+
+```bash
+'use client';
+
+import { Loader2 } from 'lucide-react';
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/presentation/components/ui/alert-dialog';
+
+interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+
+  title?: string;
+  description?: string;
+
+  confirmLabel?: string;
+  cancelLabel?: string;
+
+  variant?: 'default' | 'destructive';
+
+  onConfirm: () => void;
+  loading?: boolean;
+}
+
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title = 'Are you sure?',
+  description = 'This action cannot be undone.',
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  variant = 'default',
+  onConfirm,
+  loading = false,
+}: ConfirmDialogProps) {
+  return (
+    <AlertDialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {title}
+          </AlertDialogTitle>
+
+          <AlertDialogDescription>
+            {description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={loading}>
+            {cancelLabel}
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            disabled={loading}
+            variant={variant}
+            onClick={(event) => {
+              event.preventDefault();
+              onConfirm();
+            }}
+          >
+            {loading && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+```
+
+### If not exist Install AlertDialog
+
+```
+npx shadcn@latest add alert-dialog
+```
+
+### Add it on shared index.ts
+
+```bash
+export * from './confirm-dialog';
+```
+
+## Update crud-page.tsx
+
+```
+src/presentation/components/shared/crud-page.tsx
+```
+
+```bash
+
+"use client";
+
+import { useMemo, useState, type ReactNode } from "react";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import {
+  DataPagination,
+  SearchInput,
+  ConfirmDialog,
+  PageLoader,
+  EmptyState,
+} from "@/presentation/components/shared";
+
+import { Button } from "@/presentation/components/ui/button";
+
+import { Badge } from "@/presentation/components/ui/badge";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/presentation/components/ui/table";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/presentation/components/ui/dropdown-menu";
+
+import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+
+import type { PaginationMeta, PaginationQuery } from "@/domain/shared/entities";
+
+export interface ColumnDef<T> {
+  key: string;
+  label: string;
+  className?: string;
+  render: (item: T) => ReactNode;
+}
+
+export interface StatDef {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{
+    className?: string;
+  }>;
+  iconBg: string;
+  iconColor: string;
+}
+
+interface CrudPageConfig<
+  T extends {
+    id: string;
+    isActive: boolean;
+    name: string;
+  },
+> {
+  title: string;
+  description: string;
+  entityName: string;
+  queryKey: string;
+
+  icon: React.ComponentType<{
+    className?: string;
+  }>;
+
+  api: {
+    getAll: (params?: PaginationQuery) => Promise<{
+      items: T[];
+      meta: PaginationMeta;
+    }>;
+    delete: (id: string) => Promise<unknown>;
+  };
+
+  columns: ColumnDef<T>[];
+
+  getStats: (items: T[], total: number) => StatDef[];
+
+  extraParams?: Record<string, unknown>;
+
+  renderFormDialog: (props: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    editItem: T | null;
+    onSuccess: () => void;
+  }) => ReactNode;
+}
+
+export function CrudPage<
+  T extends {
+    id: string;
+    isActive: boolean;
+    name: string;
+  },
+>({
+  title,
+  description,
+  entityName,
+  queryKey,
+  icon: Icon,
+  api,
+  columns,
+  getStats,
+  extraParams,
+  renderFormDialog,
+}: CrudPageConfig<T>) {
+  const queryClient = useQueryClient();
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [search, setSearch] = useState("");
+
+  const [formOpen, setFormOpen] = useState(false);
+
+  const [editItem, setEditItem] = useState<T | null>(null);
+
+  const [deleteItem, setDeleteItem] = useState<T | null>(null);
+
+  // --------------------------------------------------
+  // Get data
+  // --------------------------------------------------
+
+  const { data, isLoading } = useQuery({
+    queryKey: [queryKey, page, limit, search, extraParams],
+
+    queryFn: () =>
+      api.getAll({
+        page,
+        limit,
+        search,
+        ...extraParams,
+      }),
+  });
+
+  // --------------------------------------------------
+  // Statistics
+  // --------------------------------------------------
+
+  const stats = useMemo(() => {
+    if (!data?.items) {
+      return [];
+    }
+
+    return getStats(data.items, data.meta?.total ?? data.items.length);
+  }, [data, getStats]);
+
+  // --------------------------------------------------
+  // Delete
+  // --------------------------------------------------
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey],
+      });
+
+      setDeleteItem(null);
+    },
+  });
+
+  // --------------------------------------------------
+  // Create
+  // --------------------------------------------------
+
+  const handleCreate = () => {
+    setEditItem(null);
+    setFormOpen(true);
+  };
+
+  // --------------------------------------------------
+  // Edit
+  // --------------------------------------------------
+
+  const handleEdit = (item: T) => {
+    setEditItem(item);
+    setFormOpen(true);
+  };
+
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
+
+  return (
+    <div className="space-y-6 p-6">
+      {/* Header */}
+
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      </div>
+
+      {/* Statistics */}
+
+      {stats.length > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="flex items-center gap-4 rounded-lg border bg-card p-4"
+            >
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${stat.iconBg}`}
+              >
+                <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+              </div>
+
+              <div>
+                <p className="text-2xl font-bold">{stat.value}</p>
+
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Command bar */}
+
+      <div className="flex items-center gap-3">
+        <Button size="sm" onClick={handleCreate} className="h-8 gap-1.5">
+          <Plus className="h-3.5 w-3.5" />
+          New {entityName}
+        </Button>
+
+        <SearchInput
+          value={search}
+          onChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+          placeholder={`Search ${entityName}s...`}
+          className="w-72"
+        />
+
+        <span className="ml-auto text-xs text-muted-foreground">
+          Showing {data?.items?.length ?? 0} of {data?.meta?.total ?? 0} records
+        </span>
+      </div>
+
+      {/* Content */}
+
+      {isLoading ? (
+        <PageLoader />
+      ) : !data?.items?.length ? (
+        <EmptyState
+          icon={Icon}
+          title={`No ${entityName}s found`}
+          description={
+            search
+              ? "Try a different search term"
+              : `Get started by adding your first ${entityName}`
+          }
+          action={
+            <Button size="sm" onClick={handleCreate}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              New {entityName}
+            </Button>
+          }
+        />
+      ) : (
+        <div className="overflow-hidden rounded-md border bg-card">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  {columns.map((column) => (
+                    <TableHead
+                      key={column.key}
+                      className={`h-10 text-xs font-medium text-muted-foreground ${
+                        column.className ?? ""
+                      }`}
+                    >
+                      {column.label}
+                    </TableHead>
+                  ))}
+
+                  <TableHead className="w-[50px]" />
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {data.items.map((item) => (
+                  <TableRow key={item.id} className="group hover:bg-muted/50">
+                    {columns.map((column) => (
+                      <TableCell key={column.key}>
+                        {column.render(item)}
+                      </TableCell>
+                    ))}
+
+                    {/* Actions */}
+
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                            />
+                          }
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleEdit(item)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuItem
+                            onClick={() => setDeleteItem(item)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination */}
+
+          {data.meta && (
+            <DataPagination
+              meta={data.meta}
+              onPageChange={setPage}
+              onLimitChange={(newLimit) => {
+                setLimit(newLimit);
+                setPage(1);
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Create / Edit form */}
+
+      {renderFormDialog({
+        open: formOpen,
+        onOpenChange: setFormOpen,
+        editItem,
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: [queryKey],
+          });
+
+          setFormOpen(false);
+        },
+      })}
+
+      {/* Delete confirmation */}
+
+      <ConfirmDialog
+        open={!!deleteItem}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteItem(null);
+          }
+        }}
+        title={`Delete ${entityName}`}
+        description={`Are you sure you want to delete "${deleteItem?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onConfirm={() => {
+          if (deleteItem) {
+            deleteMutation.mutate(deleteItem.id);
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+// --------------------------------------------------
+// Active / Inactive badge
+// --------------------------------------------------
+
+export function StatusBadge({ isActive }: { isActive: boolean }) {
+  return isActive ? (
+    <Badge className="border border-emerald-200 bg-emerald-50 text-[11px] text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+      Active
+    </Badge>
+  ) : (
+    <Badge variant="secondary" className="text-[11px]">
+      Inactive
+    </Badge>
+  );
+}
+  
+
+```
+
+## Update geography/regions/page.tsx
+
+```bash
+"use client";
+
+import { MapPinned } from "lucide-react";
+
+import {
+  CrudPage,
+  StatusBadge,
+} from "@/presentation/components/shared";
+
+import { regionsApi } from "@/infrastructure/geography/api/geography.api";
+
+import type { RegionResponse } from "@/domain/geography/entities";
+
+export default function RegionsPage() {
+  return (
+    <CrudPage<RegionResponse>
+      title="Regions"
+      description="Manage administrative regions."
+      entityName="Region"
+      queryKey="regions"
+      icon={MapPinned}
+      api={regionsApi}
+      columns={[
+        {
+          key: "name",
+          label: "Name",
+          render: (region) => (
+            <span className="font-medium">
+              {region.name}
+            </span>
+          ),
+        },
+        {
+          key: "code",
+          label: "Code",
+          render: (region) => (
+            <span>{region.code}</span>
+          ),
+        },
+        {
+          key: "status",
+          label: "Status",
+          render: (region) => (
+            <StatusBadge
+              isActive={region.isActive}
+            />
+          ),
+        },
+      ]}
+      getStats={(items, total) => [
+        {
+          label: "Total Regions",
+          value: total,
+          icon: MapPinned,
+          iconBg: "bg-primary/10",
+          iconColor: "text-primary",
+        },
+        {
+          label: "Active",
+          value: items.filter(
+            (region) => region.isActive,
+          ).length,
+          icon: MapPinned,
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+        },
+      ]}
+      renderFormDialog={() => null}
+    />
+  );
+}
+```
+
+
+## MasterDataFormDialog
+
+In not exist install label: npx shadcn@latest add label
+
+### Create master-data-form-dialog.tsx
+
+Create
+
+```
+
+src/presentation/components/shared/master-data-form-dialog.tsx
+
+```
+
+```bash
+"use client";
+
+import { useState, useEffect, type ReactNode } from "react";
+
+import { useMutation } from "@tanstack/react-query";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/presentation/components/ui/dialog";
+
+import { Button } from "@/presentation/components/ui/button";
+import { Input } from "@/presentation/components/ui/input";
+import { Label } from "@/presentation/components/ui/label";
+
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+type FormValue = string | boolean;
+
+type FormFields = Record<string, FormValue>;
+
+interface MasterDataFormDialogProps<T extends { id: string }> {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+
+  editItem: T | null;
+  onSuccess: () => void;
+  entityName: string;
+
+  api: {
+    create: (data: any) => Promise<any>;
+    update: (id: string, data: any) => Promise<any>;
+  };
+
+  getDefaults: (item: T | null) => FormFields;
+
+  renderExtraFields?: (
+    fields: FormFields,
+    setField: (key: string, value: FormValue) => void,
+    isLoading: boolean,
+  ) => ReactNode;
+
+  showDescription?: boolean;
+}
+
+export function MasterDataFormDialog<
+  T extends {
+    id: string;
+    name: string;
+    code: string;
+  },
+>
+
+({
+  open,
+  onOpenChange,
+  editItem,
+  onSuccess,
+  entityName,
+  api,
+  getDefaults,
+  renderExtraFields,
+  showDescription = true,
+}: MasterDataFormDialogProps<T>) {
+  const isEdit = !!editItem;
+
+  const [fields, setFields] = useState<FormFields>({});
+
+  const setField = (key: string, value: FormValue) => {
+    setFields((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  useEffect(() => {
+    if (open) {
+      setFields(getDefaults(editItem));
+    }
+  }, [open, editItem, getDefaults]);
+
+  const createMutation = useMutation({
+    mutationFn: (data: FormFields) => api.create(data),
+
+    onSuccess: () => {
+      toast.success(`${entityName} created successfully`);
+
+      onSuccess();
+    },
+
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error ? err.message : `Failed to create ${entityName}`;
+
+      toast.error(message);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: FormFields) => api.update(editItem!.id, data),
+
+    onSuccess: () => {
+      toast.success(`${entityName} updated successfully`);
+
+      onSuccess();
+    },
+
+    onError: (err: unknown) => {
+      const message =
+        err instanceof Error ? err.message : `Failed to update ${entityName}`;
+
+      toast.error(message);
+    },
+  });
+
+  const isLoading = createMutation.isPending || updateMutation.isPending;
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const payload: FormFields = {
+      ...fields,
+    };
+
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] === "") {
+        delete payload[key];
+      }
+    });
+
+    if (isEdit) {
+      updateMutation.mutate(payload);
+    } else {
+      createMutation.mutate(payload);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[700px]">
+        <DialogHeader>
+          <DialogTitle>
+            {isEdit ? `Edit ${entityName}` : `Create ${entityName}`}
+          </DialogTitle>
+
+          <DialogDescription>
+            {isEdit
+              ? `Update the ${entityName.toLowerCase()} details.`
+              : `Add a new ${entityName.toLowerCase()} to the system.`}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="md-name">Name</Label>
+
+              <Input
+                id="md-name"
+                value={(fields.name as string) ?? ""}
+                onChange={(e) => setField("name", e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="md-code">Code</Label>
+
+              <Input
+                id="md-code"
+                value={(fields.code as string) ?? ""}
+                onChange={(e) => setField("code", e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {showDescription && (
+            <div className="space-y-2">
+              <Label htmlFor="md-desc">Description</Label>
+
+              <Input
+                id="md-desc"
+                value={(fields.description as string) ?? ""}
+                onChange={(e) => setField("description", e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+          )}
+
+          {renderExtraFields?.(fields, setField, isLoading)}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
+              {isEdit ? "Save Changes" : `Create ${entityName}`}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+```
+
+- Update:
+
+```
+src/presentation/components/shared/index.ts
+
+```
+
+```bash
+
+export * from './master-data-form-dialog';
+
+```
+
+
+### Update 
+
+```
+src/app/geography/regions/page.tsx
+```
+
+```bash
+"use client";
+
+import { useCallback } from "react";
+
+import { regionsApi } from "@/infrastructure/geography/api/geography.api";
+
+import {
+  CrudPage,
+  StatusBadge,
+  MasterDataFormDialog,
+} from "@/presentation/components/shared";
+
+import type {
+  ColumnDef,
+  StatDef,
+} from "@/presentation/components/shared";
+
+import type {
+  RegionResponse,
+} from "@/domain/geography/entities";
+
+import {
+  Map,
+  Check,
+  X,
+  Database,
+} from "lucide-react";
+
+const columns: ColumnDef<RegionResponse>[] = [
+  {
+    key: "name",
+    label: "Name",
+    className: "w-[250px]",
+    render: (region) => (
+      <span className="text-[13px] font-medium text-foreground">
+        {region.name}
+      </span>
+    ),
+  },
+  {
+    key: "code",
+    label: "Code",
+    render: (region) => (
+      <span className="text-[13px] text-muted-foreground">
+        {region.code}
+      </span>
+    ),
+  },
+  {
+    key: "status",
+    label: "Status",
+    render: (region) => (
+      <StatusBadge isActive={region.isActive} />
+    ),
+  },
+];
+
+function getStats(
+  items: RegionResponse[],
+  total: number,
+): StatDef[] {
+  return [
+    {
+      label: "Total Regions",
+      value: total,
+      icon: Database,
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
+    },
+    {
+      label: "Active",
+      value: items.filter(
+        (region) => region.isActive,
+      ).length,
+      icon: Check,
+      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+    },
+    {
+      label: "Inactive",
+      value: items.filter(
+        (region) => !region.isActive,
+      ).length,
+      icon: X,
+      iconBg: "bg-amber-50",
+      iconColor: "text-amber-600",
+    },
+  ];
+}
+
+export default function RegionsPage() {
+  const getDefaults = useCallback(
+    (item: RegionResponse | null) => ({
+      name: item?.name ?? "",
+      code: item?.code ?? "",
+      isActive: item?.isActive ?? true,
+    }),
+    [],
+  );
+
+  return (
+    <CrudPage<RegionResponse>
+      title="Regions"
+      description="Manage Ethiopian administrative regions"
+      entityName="Region"
+      queryKey="regions"
+      icon={Map}
+      api={regionsApi}
+      columns={columns}
+      getStats={getStats}
+      renderFormDialog={({
+        open,
+        onOpenChange,
+        editItem,
+        onSuccess,
+      }) => (
+        <MasterDataFormDialog<RegionResponse>
+          open={open}
+          onOpenChange={onOpenChange}
+          editItem={editItem}
+          onSuccess={onSuccess}
+          entityName="Region"
+          api={regionsApi}
+          getDefaults={getDefaults}
+          showDescription={false}
+        />
+      )}
+    />
+  );
+}
+
+```
+
+### Update Css and tailwind also for better look
+
+
+## Smart Toast/ sooner & UI Feedback
+
+If not exist install it
+
+``` 
+npm install sonner
+```
+
+### Add Toaster to providers.tsx
+
+
+```
+src/presentation/components/providers.tsx
+
+```
+
+```bash
+"use client";
+
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { useState } from "react";
+import { Toaster } from "sonner";
+
+export function Providers({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 30 * 1000,
+            retry: 1,
+            refetchOnWindowFocus: false,
+          },
+          mutations: {
+            retry: 0,
+          },
+        },
+      }),
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        duration={4000}
+      />
+    </QueryClientProvider>
+  );
+}
+
+
+```
+
+### Make MasterDataFormDialog smarter
+
+Make it to automatically close after success, just add only : onOpenChange(false);
+
+
+```bash
+onSuccess: () => {
+  toast.success(`${entityName} created successfully`);
+
+  onSuccess();
+  onOpenChange(false);
+},
+
+```
+
+The same on update also
+
+
+```bash
+ onSuccess: () => {
+      toast.success(`${entityName} updated successfully`);
+
+      onSuccess();
+      onOpenChange(false);
+    },
+
+```
+
+### Better backend error extraction
+
+- Create:
+
+```
+src/lib/api-error.ts
+
+```
+ 
+```bash
+import axios from "axios";
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallback: string,
+): string {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.message;
+
+    if (Array.isArray(message)) {
+      return message.join(", ");
+    }
+
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
+
+```
+
+Then import on MasterDataFormDialog:
+
+```bash
+import { getApiErrorMessage } from "@/lib/api-error";
+
+``` 
+
+- Then update on Create Error
+
+```bash
+onError: (error: unknown) => {
+  toast.error(
+    getApiErrorMessage(
+      error,
+      `Failed to create ${entityName}`,
+    ),
+  );
+},
+```
+
+- Update
+
+```bash
+
+onError: (error: unknown) => {
+  toast.error(
+    getApiErrorMessage(
+      error,
+      `Failed to update ${entityName}`,
+    ),
+  );
+},
+
+```
+
+### Smart loading behavior
+
+
+### Smart delete confirmation
+
+Update
+
+```bash
+toast.error(
+  getApiErrorMessage(
+    error,
+    `Failed to delete ${entityName}`,
+  ),
+);
+
+```
+
+- Update on layout.tsx by deleting @/presentation/providers.tsx
+
+```bash
+
+import { Providers } from "@/presentation/components/providers";
+
+```
+
+```
+
+
+```
+
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Design the Database Before Business Modules
 
@@ -3566,6 +6065,8 @@ backend/src/
 └── utils/ # PasswordUtil, PaginationUtil, StringUtil
 ```
 
+ 
+ 
 #### Dependency Inversion in Practice
 
 Instead of use cases depending on Prisma repositories directly, we use **Symbol-based injection tokens**:
